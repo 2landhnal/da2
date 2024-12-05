@@ -1,0 +1,23 @@
+.ul-container {
+    list-style: none; /* Remove bullet points */
+    display: flex; /* Arrange list items in a row */
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+}
+
+.ul-container li {
+    margin-right: 20px; /* Add space between items */
+}
+
+.ul-container li:last-child {
+    margin-right: 0; /* Remove extra margin for the last item */
+}
+
+.ul-container .active {
+    text-decoration: none; /* Remove underline from links */
+    color: #000; /* Adjust text color */
+}
+
+.ul-container .active:hover {
+    color: #007bff; /* Add a hover effect (optional) */
+}

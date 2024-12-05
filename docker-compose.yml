@@ -1,0 +1,31 @@
+version: '1'
+services:
+    auth-service:
+        build:
+            context: ./authService
+        ports:
+            - '3001:3001'
+
+    user-service:
+        build:
+            context: ./userService
+        ports:
+            - '3002:3002'
+
+    document-service:
+        build:
+            context: ./documentService
+        ports:
+            - '3003:3003'
+
+    signature-service:
+        build:
+            context: ./signatureService
+        ports:
+            - '3004:3004'
+
+    front-end:
+        build:
+            context: ./frontEnd
+        ports:
+            - '3000:3000'
