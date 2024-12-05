@@ -1,8 +1,8 @@
-import express, { Router } from "express";
-import signatureRoute from "./signature";
+import express, { Router } from 'express';
+import teacherROute from './teacher';
 
 const router: Router = express.Router();
 
-router.use("/", signatureRoute);
+router.use('/', teacherROute);
 
 export default router;

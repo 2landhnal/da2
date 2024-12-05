@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { Model } from 'mongoose';
-import Course from '../models/course';
+import TeacherModel from '../models/teacher';
+import { post, get } from '../utils/httpRequests';
 import axios from 'axios';
 
-class CourseController {
+class TeacherController {
     // [POST] /create
     async create(
         req: Request,
@@ -11,33 +11,35 @@ class CourseController {
         next: NextFunction,
     ): Promise<void> {
         try {
-            const { courseId, courseName, courseCredit } = req.body;
-            const newCourse = new Course({
-                courseId,
-                courseName,
-                courseCredit,
+            const { ...updateFields } = req.body;
+            const newTeacher = new TeacherModel({
+                ...updateFields,
             });
-            await newCourse.save();
-            res.send({ msg: `Create course ${courseId} successfully` });
+            // create account
+            // await post(process.env.AUTH_URL, '/create', {})
+            await newTeacher.save();
+            res.send({
+                msg: `Add new teacher with id = ${newTeacher.teacherId} successfully`,
+            });
         } catch (err) {
             res.status(500).send(err);
         }
     }
 
-    // [GET] /findById/:courseId
+    // [GET] /findById/:teacherId
     async findById(
         req: Request,
         res: Response,
         next: NextFunction,
     ): Promise<void> {
         try {
-            const { courseId } = req.params;
-            const course = await Course.findOne({ courseId });
-            if (!course) {
-                res.send({ msg: `Course with id ${courseId} not found` });
+            const { teacherId } = req.params;
+            const teacher = await TeacherModel.findOne({ teacherId });
+            if (!teacher) {
+                res.send({ msg: `Teacher with id ${teacherId} not found` });
                 return;
             }
-            res.send(course);
+            res.send(teacher);
         } catch (err) {
             console.error(err);
             res.status(500).send(err);
@@ -52,75 +54,30 @@ class CourseController {
     ): Promise<void> {
         try {
             const { keyword } = req.params;
-            const courses = await Course.find({
-                courseName: { $regex: keyword, $options: 'i' },
+            const teachers = await TeacherModel.find({
+                fullName: { $regex: keyword, $options: 'i' },
             });
-            if (courses.length === 0) {
-                res.send({ msg: `Courses not found` });
+            if (teachers.length === 0) {
+                res.send({ msg: `Teachers not found` });
                 return;
             }
-            res.send(courses);
+            res.send(teachers);
         } catch (err) {
             console.error(err);
             res.status(500).send(err);
         }
     }
 
-    // [GET] /findByCredit/:courseCredit
-    async findByCredit(
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> {
-        try {
-            const { courseCredit } = req.params;
-            const courses = await Course.find({
-                courseCredit: Number(courseCredit),
-            });
-            if (courses.length === 0) {
-                res.send({
-                    msg: `Courses with number of credit = ${courseCredit} not found`,
-                });
-                return;
-            }
-            res.send(courses);
-        } catch (err) {
-            console.error(err);
-            res.status(500).send(err);
-        }
-    }
-
-    // [GET] /find/:keyword
-    async find(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-            const { keyword } = req.params;
-            const regex = new RegExp(keyword, 'i');
-            const fieldsToSearch = ['courseId', 'courseName'];
-
-            const query = {
-                $or: fieldsToSearch.map((field) => ({
-                    [field]: { $regex: regex },
-                })),
-            };
-
-            const results = await Course.find(query);
-            res.send(results);
-        } catch (err) {
-            console.error('Error finding documents:', err);
-            res.status(500).send(err);
-        }
-    }
-
-    // [DELETE] /delete/:courseId
+    // [DELETE] /delete/:teacherId
     async delete(
         req: Request,
         res: Response,
         next: NextFunction,
     ): Promise<void> {
         try {
-            const { courseId } = req.params;
-            await Course.deleteOne({ courseId });
-            res.send({ msg: `Deleted course with id ${courseId}` });
+            const { teacherId } = req.params;
+            await TeacherModel.deleteOne({ teacherId });
+            res.send({ msg: `Deleted teacher with id ${teacherId}` });
         } catch (err) {
             console.error(err);
             res.status(500).send(err);
@@ -134,18 +91,24 @@ class CourseController {
         next: NextFunction,
     ): Promise<void> {
         try {
-            const { courseId, courseName, courseCredit } = req.body;
-            const course = await Course.findOne({ courseId });
-            if (!course) {
-                res.send({ msg: `Course with id ${courseId} not found` });
+            const { teacherId, ...updateFields } = req.body;
+
+            const teacher = await TeacherModel.findOne({ teacherId });
+            if (!teacher) {
+                res.send({ msg: `Teacher with id ${teacherId} not found` });
                 return;
             }
 
-            if (courseName) course.courseName = courseName;
-            if (courseCredit) course.courseCredit = courseCredit;
-            await course.save();
+            // Duyệt qua các trường để cập nhật
+            Object.entries(updateFields).forEach(([key, value]) => {
+                if (value !== undefined) {
+                    (teacher as any)[key] = value; // Ép kiểu nếu key không có trong model
+                }
+            });
 
-            res.send(course);
+            await teacher.save();
+
+            res.send(teacher);
         } catch (err) {
             console.error(err);
             res.status(500).send(err);
@@ -208,5 +171,14 @@ async function authenticateMiddleware(
     }
 }
 
-export const courseController = new CourseController();
+export const teacherController = new TeacherController();
 export { authenticateMiddleware };
+
+// "teacherId",
+// "fullName",
+// "address",
+// "phone",
+// "dob",
+// "gender",
+// "degree",
+// "email",
