@@ -25,6 +25,13 @@ const accountSchema = new mongoose.Schema({
             'Please fill a valid email address',
         ],
     },
+    role: {
+        type: Number,
+        default: 3,
+    },
+    // 1: admin
+    // 2: teacher
+    // 3: student
 });
 
 async function hashWithSalt(password, saltRound) {

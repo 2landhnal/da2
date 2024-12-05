@@ -36,6 +36,7 @@ class AccountController {
             const acc = new Account({
                 email: req.body.email,
                 password: req.body.password,
+                role: req.body.role || 3,
             });
             await acc.save();
             res.send({

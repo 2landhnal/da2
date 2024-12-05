@@ -61,6 +61,7 @@ class TokenController {
         console.log(`Hashed token ${hashedToken} removed from list`);
     };
 
+    // use in this service only
     authenticateToken(req, res, next) {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
@@ -73,6 +74,23 @@ class TokenController {
             }
             req.body.accountId = account.accountId;
             next();
+        });
+    }
+
+    // [GET] /validateToken
+    // use for another service
+    validateToken(req, res) {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+        if (!token) return res.status(401).send({ msg: 'Token is required' });
+
+        jwt.verify(token, process.env.SECRET_TOKEN_KEY, (err, account) => {
+            if (err) {
+                console.error('Token verification failed:', err);
+                return res.status(403).send({ msg: 'Invalid token' });
+            }
+            // Trả về accountId nếu token hợp lệ
+            res.status(200).send({ accountId: account.accountId });
         });
     }
 }

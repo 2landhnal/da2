@@ -43,12 +43,17 @@ router.get('/isAccountExist/:accountId', accountController.getAccount);
 router.delete('/logout', accountController.logout);
 
 // Get new access token
-// REQUIRE: req.body include {refreshToken}
+// REQUIRE: req.header.authorization = "Bearer {refreshToken}"
 // RETURN: {accessToken}
 router.post('/refreshAccessToken', tokenController.refreshAccessToken);
 
+// Get new access token
+// REQUIRE: req.header.authorization = "Bearer {refreshToken}"
+// RETURN: {accountId}
+router.get('/validateToken', tokenController.validateToken);
+
 router.get('/', (req, res, next) => {
-    res.send({ msg: 'Account service' });
+    res.send({ msg: 'Auth service' });
 });
 
 module.exports = router;
