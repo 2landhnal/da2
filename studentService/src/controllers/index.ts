@@ -4,12 +4,16 @@ import { post, get } from '../utils/httpRequests';
 import axios from 'axios';
 
 class StudentController {
+    constructor() {
+        this.create = this.create.bind(this);
+    }
     // [POST] /register/:numberOfSuffix
     async register(
         req: Request,
         res: Response,
         next: NextFunction,
     ): Promise<void> {
+        console.log('Start register');
         try {
             const numberOfSuffix = parseInt(req.params.numberOfSuffix);
             const { yoa, email, ...otherFields } = req.body;
@@ -28,52 +32,50 @@ class StudentController {
             const password = require('crypto')
                 .randomBytes(passLen)
                 .toString('hex');
-            // create account
-            await post(
+            //create account
+            const newAcc = await post(
                 process.env.AUTH_URL as string,
                 '/create',
-                { email: studentEmail, password },
+                { email: studentEmail, password, role: 2 },
                 {
                     headers: {
                         authorization: req.headers['authorization'] as string,
                     },
                 },
             );
+            console.log(newAcc);
             console.log(`Create account ${studentEmail + '_' + password} done`);
+
             // create user
-            //const newStudent = await this.createStudent(email, ...otherFields);
+            const studentJson = { yoa, email, studentId, ...otherFields };
+            studentJson.accountId = newAcc._id;
+            const newStudent = new StudentModel(studentJson);
+            await newStudent.save();
             console.log('Create user done');
             // send email to student
             // TODO
             res.send({
-                msg: 'Add new Student with id = ${newStudent.studentId} successfully',
+                msg: `Add new Student with email ${studentEmail} successfully`,
             });
         } catch (err) {
             res.status(500).send(err);
         }
     }
-    async createStudent(...inforFields: any[]): Promise<Student> {
-        const newStudent = new StudentModel({
-            ...inforFields,
-        });
-        // create account
-        // await post(process.env.AUTH_URL, '/create', {})
-        await newStudent.save();
-        return newStudent; // Return the created student
-    }
-    // [POST] /create
+
     async create(
         req: Request,
         res: Response,
         next: NextFunction,
     ): Promise<void> {
         try {
-            const { ...inforFields } = req.body;
-            const newStudent = await this.createStudent(...inforFields);
+            const inforFields = req.body; // Pass the body directly
+            const newStudent = new StudentModel(inforFields);
+            await newStudent.save();
             res.send({
-                msg: `Add new Student with id = ${newStudent.studentId} successfully`,
+                msg: `Add new Student with id = ${inforFields.studentId} successfully`,
             });
         } catch (err) {
+            console.error(err); // Log the error for debugging
             res.status(500).send(err);
         }
     }
@@ -237,6 +239,7 @@ async function authenticateMiddleware(
         req.body.accountId = accountId; // Attach accountId to the request for future use
         next();
     } catch (error) {
+        console.log(error);
         res.status(403).send({ msg: 'Forbidden' });
     }
 }

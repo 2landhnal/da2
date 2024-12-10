@@ -16,9 +16,8 @@ class TeacherController {
                 ...updateFields,
             });
             // create account
-            // await post(process.env.AUTH_URL, '/create', {})
             await newTeacher.save();
-            
+
             res.send({
                 msg: `Add new teacher with id = ${newTeacher.teacherId} successfully`,
             });

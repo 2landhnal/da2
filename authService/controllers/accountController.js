@@ -37,16 +37,23 @@ class AccountController {
                 email: req.body.email,
                 password: req.body.password,
             };
-            console.log(fields);
+            // Check if the account already exists
+            const existingAccount = await Account.findOne({
+                email: fields.email,
+            });
+            if (existingAccount) {
+                return res.status(400).send({
+                    msg: `Account with email ${fields.email} already exists`,
+                });
+            }
+
             const acc = new Account({
                 ...fields,
                 role: req.body.role || 3,
             });
             await acc.save();
             console.log(`Create account ${req.body.email} successfully`);
-            res.send({
-                msg: `Create account ${req.body.email} successfully`,
-            });
+            res.send(acc);
         } catch (err) {
             res.send(err);
         }

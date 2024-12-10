@@ -60,8 +60,14 @@ router.get(
     tokenController.checkAdmin,
 );
 
-// Get new access token
-// REQUIRE: req.header.authorization = "Bearer {refreshToken}"
+router.get(
+    '/checkAuth',
+    tokenController.authenticateToken,
+    tokenController.checkAuth,
+);
+
+// Validate token
+// REQUIRE: req.header.authorization = "Bearer {accessToken}"
 // RETURN: {accountId}
 router.get('/validateToken', tokenController.validateToken);
 

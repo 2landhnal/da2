@@ -18,5 +18,9 @@ mongoose.connect(process.env.DB_URL);
 const db = mongoose.connection;
 db.on('error', (err) => console.error(err));
 db.once('open', () => console.log('Mongoose connected'));
+console.log(`Listening on port ${process.env.PORT || 3000}`);
 
-app.listen(process.env.PORT || 3000);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});

@@ -2,14 +2,23 @@ const jwt = require('jsonwebtoken');
 const { RefreshToken, findHashedToken } = require('../models/refreshToken');
 const { getorCache } = require('../ultis/helper');
 
+const expireDuration = '20m';
+
 class TokenController {
-    generateAccessToken = async (account) => {
-        return jwt.sign(account, process.env.SECRET_TOKEN_KEY, {
-            expiresIn: '20m',
-        });
+    generateToken = async (tokenData, key, expiresIn = '') => {
+        const payload = {
+            ...tokenData,
+            iat: Math.floor(Date.now() / 1000), // Add current timestamp
+        };
+        const options = {};
+        if (expiresIn != '') {
+            options.expiresIn = expiresIn;
+        }
+        return jwt.sign(payload, key, options);
     };
 
     getNewAccessToken = async (refreshToken) => {
+        // check if exist in db
         const isValid = await findHashedToken(refreshToken);
         if (isValid === null) {
             console.log('Refresh token is not in list');
@@ -17,9 +26,16 @@ class TokenController {
         }
 
         try {
-            const account = jwt.verify(refreshToken, process.env.REFRESH_TOKEN);
-            console.log(account);
-            const newAccessToken = await this.generateAccessToken(account);
+            const tokenData = jwt.verify(
+                refreshToken,
+                process.env.REFRESH_TOKEN,
+            );
+            console.log(tokenData);
+            const newAccessToken = await this.generateToken(
+                tokenData,
+                process.env.SECRET_TOKEN_KEY,
+                expireDuration,
+            );
             return { accessToken: newAccessToken };
         } catch (err) {
             return { err: 'Invalid token' };
@@ -41,9 +57,16 @@ class TokenController {
         res.send({ accessToken });
     };
 
-    generatePairToken = async (account) => {
-        const accessToken = await this.generateAccessToken(account);
-        const refreshToken = await jwt.sign(account, process.env.REFRESH_TOKEN);
+    generatePairToken = async (tokenData) => {
+        const accessToken = await this.generateToken(
+            tokenData,
+            process.env.SECRET_TOKEN_KEY,
+            expireDuration,
+        );
+        const refreshToken = await this.generateToken(
+            tokenData,
+            process.env.REFRESH_TOKEN,
+        );
         const refreshTokenToPush = new RefreshToken({ token: refreshToken });
         await refreshTokenToPush.save();
         console.log('Push refresh token success');
@@ -88,7 +111,6 @@ class TokenController {
                 console.log(err);
                 return res.sendStatus(403);
             }
-            console.log(tokenData);
             if (tokenData.role != 1) {
                 console.log('Admin required!');
                 return res.sendStatus(403);
@@ -104,20 +126,30 @@ class TokenController {
         res.json({ msg: 'Admin okay' });
     }
 
+    //[GET] /testCheckAdmin
+    checkAuth(req, res) {
+        res.json({ msg: 'Auth okay' });
+    }
+
     // [GET] /validateToken
     // use for another service
     validateToken(req, res) {
+        console.log(`${Date().toLocaleString()} Validate token called`);
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
-        if (!token) return res.status(401).send({ msg: 'Token is required' });
+        if (token == null) {
+            console.log('No token');
+            return res.status(401).send({ msg: 'Token is required' });
+        }
 
-        jwt.verify(token, process.env.SECRET_TOKEN_KEY, (err, account) => {
+        jwt.verify(token, process.env.SECRET_TOKEN_KEY, (err, tokenData) => {
             if (err) {
                 console.error('Token verification failed:', err);
                 return res.status(403).send({ msg: 'Invalid token' });
             }
             // Trả về accountId nếu token hợp lệ
-            res.status(200).send({ accountId: account.accountId });
+            console.log('Access token valid');
+            res.status(200).send({ accountId: tokenData.accountId });
         });
     }
 }
