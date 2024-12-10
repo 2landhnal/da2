@@ -1,9 +1,66 @@
 import { Request, Response, NextFunction } from 'express';
-import StudentModel from '../models/student';
+import StudentModel, { Student } from '../models/student';
 import { post, get } from '../utils/httpRequests';
 import axios from 'axios';
 
 class StudentController {
+    // [POST] /register/:numberOfSuffix
+    async register(
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> {
+        try {
+            const numberOfSuffix = parseInt(req.params.numberOfSuffix);
+            const { yoa, email, ...otherFields } = req.body;
+            // fetch current number of student with same yoa
+            const numberOfStudentWithYoa = await StudentModel.where({
+                yoa,
+            }).countDocuments();
+            // gen studentId = yoa + index
+            const studentId = `${yoa}${numberOfStudentWithYoa
+                .toString()
+                .padStart(numberOfSuffix, '0')}`;
+            // gen email studentId + @hust.edu.vn
+            const studentEmail = `${studentId}@hust.edu.vn`;
+            // gen password
+            const passLen = 8;
+            const password = require('crypto')
+                .randomBytes(passLen)
+                .toString('hex');
+            // create account
+            await post(
+                process.env.AUTH_URL as string,
+                '/create',
+                { email: studentEmail, password },
+                {
+                    headers: {
+                        authorization: req.headers['authorization'] as string,
+                    },
+                },
+            );
+            console.log(`Create account ${studentEmail + '_' + password} done`);
+            // create user
+            //const newStudent = await this.createStudent(email, ...otherFields);
+            console.log('Create user done');
+            // send email to student
+            // TODO
+            res.send({
+                msg: 'Add new Student with id = ${newStudent.studentId} successfully',
+            });
+        } catch (err) {
+            res.status(500).send(err);
+        }
+    }
+    async createStudent(...inforFields: any[]): Promise<Student> {
+        const newStudent = new StudentModel({
+            ...inforFields,
+        });
+        // create account
+        // await post(process.env.AUTH_URL, '/create', {})
+        await newStudent.save();
+        return newStudent; // Return the created student
+    }
     // [POST] /create
     async create(
         req: Request,
@@ -11,13 +68,8 @@ class StudentController {
         next: NextFunction,
     ): Promise<void> {
         try {
-            const { ...updateFields } = req.body;
-            const newStudent = new StudentModel({
-                ...updateFields,
-            });
-            // create account
-            // await post(process.env.AUTH_URL, '/create', {})
-            await newStudent.save();
+            const { ...inforFields } = req.body;
+            const newStudent = await this.createStudent(...inforFields);
             res.send({
                 msg: `Add new Student with id = ${newStudent.studentId} successfully`,
             });
@@ -62,6 +114,24 @@ class StudentController {
                 return;
             }
             res.send(students);
+        } catch (err) {
+            console.error(err);
+            res.status(500).send(err);
+        }
+    }
+
+    // [GET] /find
+    async find(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const query = req.query; // Lấy các query params từ request
+            const students = await StudentModel.find(query); // Sử dụng query params để tìm tài liệu
+
+            if (students.length === 0) {
+                res.send({ msg: 'No students found matching the query' });
+                return;
+            }
+
+            res.send(students); // Trả về danh sách các tài liệu
         } catch (err) {
             console.error(err);
             res.status(500).send(err);

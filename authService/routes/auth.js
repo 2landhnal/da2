@@ -4,14 +4,18 @@ const accountController = require('../controllers/accountController');
 const tokenController = require('../controllers/tokenController');
 
 // Login account
-// REQUIRE: req.body include {username, password}
+// REQUIRE: req.body include {email, password}
 // RETURN: {accessToken, refreshToken}
 router.post('/login', accountController.login);
 
 // Create new account
-// REQUIRE: req.body include {username, password, email}
+// REQUIRE: req.body include {email, password, email}
 // RETURN: {msg}
-router.post('/create', accountController.create);
+router.post(
+    '/create',
+    tokenController.authenticateAdminToken,
+    accountController.create,
+);
 
 // Change password
 // REQUIRE: req.header.authorization = "Bearer {accessToken}"
@@ -46,6 +50,15 @@ router.delete('/logout', accountController.logout);
 // REQUIRE: req.header.authorization = "Bearer {refreshToken}"
 // RETURN: {accessToken}
 router.post('/refreshAccessToken', tokenController.refreshAccessToken);
+
+// Test check admin
+// REQUIRE: req.header.authorization = "Bearer {accessToken}"
+// RETURN: {msg}
+router.get(
+    '/testCheckAdmin',
+    tokenController.authenticateAdminToken,
+    tokenController.checkAdmin,
+);
 
 // Get new access token
 // REQUIRE: req.header.authorization = "Bearer {refreshToken}"

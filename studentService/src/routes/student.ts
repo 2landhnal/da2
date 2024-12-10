@@ -3,13 +3,23 @@ import { studentController, authenticateMiddleware } from '../controllers';
 
 const router = express.Router();
 
-// Create new course
+// Create new student
 // REQUIRE: req.header.authorization = "Bearer {accessToken}"
-// REQUIRE: req.body = {...courseId, courseName, courseCredit}
+// REQUIRE: req.body = {...studentId, studentName, studentCredit}
 // RETURN: {msg}
 router.post('/create', authenticateMiddleware, studentController.create);
 
-// Find course by id
+// Create new student and account
+// REQUIRE: req.header.authorization = "Bearer {accessToken}"
+// REQUIRE: req.body = {...studentId, studentName, studentCredit}
+// RETURN: {msg}
+router.post(
+    '/register/:numberOfSuffix',
+    authenticateMiddleware,
+    studentController.register,
+);
+
+// Find student by id
 // REQUIRE: req.header.authorization = "Bearer {accessToken}"
 // RETURN: {msg}
 router.get(
@@ -18,21 +28,26 @@ router.get(
     studentController.findById,
 );
 
-// Find courses by name
+// Find students by name
 // REQUIRE: req.header.authorization = "Bearer {accessToken}"
-// RETURN: [courses]
+// RETURN: [students]
 router.get(
     '/findByName/:keyword',
     authenticateMiddleware,
     studentController.findByName,
 );
 
-// Update course
+// Find students by name
 // REQUIRE: req.header.authorization = "Bearer {accessToken}"
-// RETURN: {course}
+// RETURN: [students]
+router.get('/find', authenticateMiddleware, studentController.find);
+
+// Update student
+// REQUIRE: req.header.authorization = "Bearer {accessToken}"
+// RETURN: {student}
 router.put('/update', authenticateMiddleware, studentController.update);
 
-// Delete course
+// Delete student
 // REQUIRE: req.header.authorization = "Bearer {accessToken}"
 // RETURN: {msg}
 router.delete(

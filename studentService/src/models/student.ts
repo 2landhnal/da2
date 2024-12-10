@@ -1,4 +1,4 @@
-import { Schema, model, Document, Date } from 'mongoose';
+import { Schema, model, Document, Date, Number } from 'mongoose';
 
 interface Student extends Document {
     studentId: string;
@@ -8,6 +8,7 @@ interface Student extends Document {
     dob: Date;
     gender: string;
     email: string;
+    yoa: Number; //year of admission
 }
 
 const StudentSchema = new Schema<Student>({
@@ -18,8 +19,10 @@ const StudentSchema = new Schema<Student>({
     dob: { type: Date, default: Date.now },
     gender: { type: String, default: 'Unknown' },
     email: { type: String, unique: true, required: true },
+    yoa: { type: Number, required: true },
 });
 
 const StudentModel = model<Student>('Student', StudentSchema);
 
+export { Student };
 export default StudentModel;

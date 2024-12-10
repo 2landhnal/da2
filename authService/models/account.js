@@ -46,6 +46,7 @@ accountSchema.pre('save', async function (next) {
     }
     console.log('modified');
     this.password = await hashWithSalt(this.password, saltRound);
+    console.log('hashed');
     next();
 });
 

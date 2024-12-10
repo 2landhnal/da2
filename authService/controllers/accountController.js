@@ -19,7 +19,7 @@ class AccountController {
                     .send({ msg: 'email or password invalid' });
             }
 
-            const account = { accountId: acc._id };
+            const account = { accountId: acc._id, role: acc.role };
             const tokenPair = await tokenController.generatePairToken(account);
             res.json({ ...account, ...tokenPair });
         } catch (err) {
@@ -33,12 +33,17 @@ class AccountController {
     // [POST] /create
     async create(req, res, next) {
         try {
-            const acc = new Account({
+            const fields = {
                 email: req.body.email,
                 password: req.body.password,
+            };
+            console.log(fields);
+            const acc = new Account({
+                ...fields,
                 role: req.body.role || 3,
             });
             await acc.save();
+            console.log(`Create account ${req.body.email} successfully`);
             res.send({
                 msg: `Create account ${req.body.email} successfully`,
             });
