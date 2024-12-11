@@ -7,7 +7,17 @@ const router = express.Router();
 // REQUIRE: req.header.authorization = "Bearer {accessToken}"
 // REQUIRE: req.body = {...courseId, courseName, courseCredit}
 // RETURN: {msg}
-router.post('/create', authenticateMiddleware, teacherController.create);
+// router.post('/create', authenticateMiddleware, teacherController.create);
+
+// Create new student and account
+// REQUIRE: req.header.authorization = "Bearer {accessToken}"
+// REQUIRE: req.body = {...studentId, studentName, studentCredit}
+// RETURN: {msg}
+router.post(
+    '/register/:numberOfSuffix',
+    authenticateMiddleware,
+    teacherController.register,
+);
 
 // Find course by id
 // REQUIRE: req.header.authorization = "Bearer {accessToken}"

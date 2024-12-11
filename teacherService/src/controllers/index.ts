@@ -1,27 +1,90 @@
 import { Request, Response, NextFunction } from 'express';
 import TeacherModel from '../models/teacher';
-import { post, get } from '../utils/httpRequests';
+import { post, get, del } from '../utils/httpRequests';
 import axios from 'axios';
 
+function nameToPrefix(input: string) {
+    const words = input.split(' '); // Tách chuỗi thành mảng
+    const lastWord = words.pop(); // Lấy phần tử cuối
+    const restWords = words.map((word) => word.charAt(0)).join(''); // Lấy ký tự đầu của các từ còn lại
+    return `${lastWord}.${restWords}`.toLowerCase(); // Kết hợp lại theo định dạng yêu cầu
+}
+
 class TeacherController {
-    // [POST] /create
-    async create(
+    // [POST] /register/:numberOfSuffix
+    async register(
         req: Request,
         res: Response,
         next: NextFunction,
     ): Promise<void> {
+        console.log('Start register');
+        let accountCreated = false;
+        let userCreated = false;
+        let teacherEmail;
+        let teacherId;
         try {
-            const { ...updateFields } = req.body;
-            const newTeacher = new TeacherModel({
-                ...updateFields,
-            });
-            // create account
-            await newTeacher.save();
+            const numberOfSuffix = parseInt(req.params.numberOfSuffix);
+            const { yoj, email, ...otherFields } = req.body;
+            // fetch current number of teacher with same yoj
+            const numberOfteacherWithyoj = await TeacherModel.where({
+                yoj,
+            }).countDocuments();
+            // gen teacherId = yoj + index
+            teacherId = `${yoj}${numberOfteacherWithyoj
+                .toString()
+                .padStart(numberOfSuffix, '0')}`;
+            // gen email teacherId + @hust.edu.vn
+            teacherEmail = `${nameToPrefix(
+                otherFields.fullName,
+            )}${teacherId}@hust.edu.vn`;
+            // gen password
+            const passLen = 8;
+            const password = require('crypto')
+                .randomBytes(passLen)
+                .toString('hex');
+            //create account
+            const newAcc = await post(
+                process.env.AUTH_URL as string,
+                '/create',
+                { email: teacherEmail, password, role: 2 },
+                {
+                    headers: {
+                        authorization: req.headers['authorization'] as string,
+                    },
+                },
+            );
+            accountCreated = true;
+            console.log(`Create account ${teacherEmail + '_' + password} done`);
 
+            // create user
+            const teacherJson = { yoj, email, teacherId, ...otherFields };
+            teacherJson.accountId = newAcc._id;
+            const newteacher = new TeacherModel(teacherJson);
+            await newteacher.save();
+            userCreated = true;
+            console.log('Create user done');
+            // send email to teacher
+            // TODO
             res.send({
-                msg: `Add new teacher with id = ${newTeacher.teacherId} successfully`,
+                msg: `Add new teacher with email ${teacherEmail} successfully`,
             });
         } catch (err) {
+            if (accountCreated) {
+                await del(
+                    process.env.AUTH_URL as string,
+                    `/delete/${teacherEmail}`,
+                    {
+                        headers: {
+                            authorization: req.headers[
+                                'authorization'
+                            ] as string,
+                        },
+                    },
+                );
+            }
+            if (userCreated) {
+                await TeacherModel.deleteOne({ teacherId });
+            }
             res.status(500).send(err);
         }
     }

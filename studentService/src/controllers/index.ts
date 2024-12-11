@@ -1,12 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
-import StudentModel, { Student } from '../models/student';
-import { post, get } from '../utils/httpRequests';
+import StudentModel from '../models/student';
+import { post, get, del } from '../utils/httpRequests';
 import axios from 'axios';
 
+function nameToPrefix(input: string) {
+    const words = input.split(' '); // Tách chuỗi thành mảng
+    const lastWord = words.pop(); // Lấy phần tử cuối
+    const restWords = words.map((word) => word.charAt(0)).join(''); // Lấy ký tự đầu của các từ còn lại
+    return `${lastWord}.${restWords}`.toLowerCase(); // Kết hợp lại theo định dạng yêu cầu
+}
+
 class StudentController {
-    constructor() {
-        this.create = this.create.bind(this);
-    }
     // [POST] /register/:numberOfSuffix
     async register(
         req: Request,
@@ -14,6 +18,10 @@ class StudentController {
         next: NextFunction,
     ): Promise<void> {
         console.log('Start register');
+        let accountCreated = false;
+        let userCreated = false;
+        let studentEmail;
+        let studentId;
         try {
             const numberOfSuffix = parseInt(req.params.numberOfSuffix);
             const { yoa, email, ...otherFields } = req.body;
@@ -22,11 +30,13 @@ class StudentController {
                 yoa,
             }).countDocuments();
             // gen studentId = yoa + index
-            const studentId = `${yoa}${numberOfStudentWithYoa
+            studentId = `${yoa}${numberOfStudentWithYoa
                 .toString()
                 .padStart(numberOfSuffix, '0')}`;
             // gen email studentId + @hust.edu.vn
-            const studentEmail = `${studentId}@hust.edu.vn`;
+            studentEmail = `${nameToPrefix(
+                otherFields.fullName,
+            )}${studentId}@hust.edu.vn`;
             // gen password
             const passLen = 8;
             const password = require('crypto')
@@ -36,14 +46,14 @@ class StudentController {
             const newAcc = await post(
                 process.env.AUTH_URL as string,
                 '/create',
-                { email: studentEmail, password, role: 2 },
+                { email: studentEmail, password, role: 3 },
                 {
                     headers: {
                         authorization: req.headers['authorization'] as string,
                     },
                 },
             );
-            console.log(newAcc);
+            accountCreated = true;
             console.log(`Create account ${studentEmail + '_' + password} done`);
 
             // create user
@@ -51,6 +61,7 @@ class StudentController {
             studentJson.accountId = newAcc._id;
             const newStudent = new StudentModel(studentJson);
             await newStudent.save();
+            userCreated = true;
             console.log('Create user done');
             // send email to student
             // TODO
@@ -58,24 +69,22 @@ class StudentController {
                 msg: `Add new Student with email ${studentEmail} successfully`,
             });
         } catch (err) {
-            res.status(500).send(err);
-        }
-    }
-
-    async create(
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> {
-        try {
-            const inforFields = req.body; // Pass the body directly
-            const newStudent = new StudentModel(inforFields);
-            await newStudent.save();
-            res.send({
-                msg: `Add new Student with id = ${inforFields.studentId} successfully`,
-            });
-        } catch (err) {
-            console.error(err); // Log the error for debugging
+            if (accountCreated) {
+                await del(
+                    process.env.AUTH_URL as string,
+                    `/delete/${studentEmail}`,
+                    {
+                        headers: {
+                            authorization: req.headers[
+                                'authorization'
+                            ] as string,
+                        },
+                    },
+                );
+            }
+            if (userCreated) {
+                await StudentModel.deleteOne({ studentId });
+            }
             res.status(500).send(err);
         }
     }

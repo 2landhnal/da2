@@ -46,4 +46,21 @@ export const post = async (
     }
 };
 
+// DELETE request
+export const del = async (
+    baseURL: string,
+    path: string,
+    options: RequestOptions = {},
+) => {
+    try {
+        const response = await request(baseURL).delete(path, {
+            headers: options.headers || {}, // Include custom headers if provided
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`DELETE request failed: ${error}`);
+        throw error; // Propagate error for further handling if needed
+    }
+};
+
 export default request;

@@ -102,6 +102,20 @@ class AccountController {
         }
     }
 
+    // [DELETE] /delete/:email
+    async delete(req, res, next) {
+        try {
+            const email = req.params.email;
+            if (email == null) {
+                res.send({ msg: `Email as param required` });
+            }
+            await Account.deleteOne({ email });
+            res.send({ msg: `Delete account successfully` });
+        } catch (err) {
+            res.send(err);
+        }
+    }
+
     // [DELETE] /logout
     async logout(req, res, next) {
         try {

@@ -7,7 +7,7 @@ const router = express.Router();
 // REQUIRE: req.header.authorization = "Bearer {accessToken}"
 // REQUIRE: req.body = {...studentId, studentName, studentCredit}
 // RETURN: {msg}
-router.post('/create', authenticateMiddleware, studentController.create);
+// router.post('/create', authenticateMiddleware, studentController.create);
 
 // Create new student and account
 // REQUIRE: req.header.authorization = "Bearer {accessToken}"

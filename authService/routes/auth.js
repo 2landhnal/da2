@@ -46,6 +46,11 @@ router.get('/isAccountExist/:accountId', accountController.getAccount);
 // RETURN: {msg}
 router.delete('/logout', accountController.logout);
 
+// Delete account
+// REQUIRE: req.body include {accessToken}
+// RETURN: {msg}
+router.delete('/delete/:email', accountController.delete);
+
 // Get new access token
 // REQUIRE: req.header.authorization = "Bearer {refreshToken}"
 // RETURN: {accessToken}
