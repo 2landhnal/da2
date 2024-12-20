@@ -1,6 +1,6 @@
-const Account = require('../models/account');
-const tokenController = require('./tokenController');
-const jwt = require('jsonwebtoken');
+import Account from '../models/account.js';
+import tokenController from './tokenController.js';
+import jwt from 'jsonwebtoken';
 
 class AccountController {
     // [POST] /login
@@ -16,12 +16,12 @@ class AccountController {
             if (!isCorrect) {
                 return res
                     .status(401)
-                    .send({ msg: 'email or password invalid' });
+                    .send({ msg: 'Email or password invalid' });
             }
 
             const account = { accountId: acc._id, role: acc.role };
             const tokenPair = await tokenController.generatePairToken(account);
-            res.json({ ...account, ...tokenPair });
+            res.status(200).json({ ...account, ...tokenPair });
         } catch (err) {
             res.status(500).send({
                 msg: 'Internal Server Error',
@@ -53,52 +53,58 @@ class AccountController {
             });
             await acc.save();
             console.log(`Create account ${req.body.email} successfully`);
-            res.send(acc);
+            res.status(200).json(acc);
         } catch (err) {
-            res.send(err);
+            res.status(500).json({ err });
+        }
+    }
+
+    // [GET] /find/:keyword
+    async find(req, res, next) {
+        try {
+            const fieldsToSearch = ['_id', 'fullName']; // Define fields to search
+            const regex = new RegExp(req.params.keyword, 'i'); // Case-insensitive regex
+
+            const query = {
+                $or: fieldsToSearch.map((field) => ({
+                    [field]: { $regex: regex },
+                })),
+            };
+
+            const results = await Account.find(query);
+            console.log('Matching documents:', results);
+            res.status(200).json(results);
+        } catch (err) {
+            console.error('Error finding documents:', err);
+            res.status(500).json({ error });
         }
     }
 
     // [PUT] /update
     async update(req, res, next) {
         try {
-            console.log(req.body.accountId);
-            const acc = await Account.findOne({ _id: req.body.accountId });
+            const { accountId } = req.tokenData;
+            const acc = await Account.findOne({ _id: accountId });
             acc.password = req.body.newPassword;
             await acc.save();
-            res.send({
-                msg: `Update account ${req.body.accountId} successfully`,
+            res.status(200).json({
+                msg: `Update account ${accountId} successfully`,
             });
         } catch (err) {
-            res.send(err);
+            console.error(err);
+            res.status(500).json({ error });
         }
     }
 
     // [GET] /getAccount
     async getAccount(req, res, next) {
         try {
-            console.log(req.body.accountId);
-            const account = await Account.findOne({ _id: req.body.accountId });
-            res.send({ accountId: account.id });
+            const { accountId } = req.tokenData;
+            const account = await Account.findOne({ _id: accountId });
+            res.status(200).json(account);
         } catch (err) {
-            res.send(err);
-        }
-    }
-
-    // [GET] /isAccountExist/:accountId
-    async isAccountExist(req, res, next) {
-        try {
-            console.log(req.params.accountId);
-            const account = await Account.findOne({
-                _id: req.params.accountId,
-            });
-            if (account != null) {
-                res.send({ exist: true });
-            } else {
-                res.send({ exist: false });
-            }
-        } catch (err) {
-            res.send(err);
+            console.error(err);
+            res.status(500).json({ error });
         }
     }
 
@@ -110,9 +116,10 @@ class AccountController {
                 res.send({ msg: `Email as param required` });
             }
             await Account.deleteOne({ email });
-            res.send({ msg: `Delete account successfully` });
+            res.status(200).json({ msg: `Delete account successfully` });
         } catch (err) {
-            res.send(err);
+            console.error(err);
+            res.status(500).json({ error });
         }
     }
 
@@ -122,11 +129,12 @@ class AccountController {
             const authHeader = req.headers['authorization'];
             const refreshToken = authHeader && authHeader.split(' ')[1];
             await tokenController.removeRefreshToken(refreshToken);
-            res.send({ msg: `Logout account successfully` });
+            res.status(200).json({ msg: `Logout account successfully` });
         } catch (err) {
-            res.send(err);
+            console.error(err);
+            res.status(500).json({ error });
         }
     }
 }
 
-module.exports = new AccountController();
+export default new AccountController();

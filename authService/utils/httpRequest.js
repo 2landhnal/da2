@@ -48,9 +48,10 @@ export const put = async (baseURL, path, body = {}, options = {}) => {
 };
 
 // DELETE request
-export const del = async (baseURL, path, options = {}) => {
+export const del = async (baseURL, path, body = {}, options = {}) => {
     try {
         const response = await request(baseURL).delete(path, {
+            data: body || {},
             headers: options.headers || {}, // Include custom headers if provided
             params: options.params || {}, // Include query parameters if provided
         });

@@ -1,6 +1,5 @@
-const jwt = require('jsonwebtoken');
-const { RefreshToken, findHashedToken } = require('../models/refreshToken');
-const { getorCache } = require('../ultis/helper');
+import jwt from 'jsonwebtoken';
+import { RefreshToken, findHashedToken } from '../models/refreshToken.js';
 
 const expireDuration = '20m';
 
@@ -42,21 +41,6 @@ class TokenController {
         }
     };
 
-    // [POST] /refreshAccessToken
-    refreshAccessToken = async (req, res, next) => {
-        console.log('Refresh access token called');
-        const authHeader = req.headers['authorization'];
-        const refreshToken = authHeader && authHeader.split(' ')[1];
-        if (refreshToken == null) return res.sendStatus(401);
-
-        const { err, accessToken } = await this.getNewAccessToken(refreshToken);
-        if (err) {
-            return res.sendStatus(403);
-        }
-
-        res.send({ accessToken });
-    };
-
     generatePairToken = async (tokenData) => {
         const accessToken = await this.generateToken(
             tokenData,
@@ -84,74 +68,23 @@ class TokenController {
         console.log(`Hashed token ${hashedToken} removed from list`);
     };
 
-    // use in this service only
-    authenticateToken(req, res, next) {
+    // [POST] /refreshAccessToken
+    refreshAccessToken = async (req, res, next) => {
+        console.log('Refresh access token called');
         const authHeader = req.headers['authorization'];
-        const token = authHeader && authHeader.split(' ')[1];
-        if (token == null) return res.sendStatus(401);
-
-        jwt.verify(token, process.env.SECRET_TOKEN_KEY, (err, tokenData) => {
-            if (err) {
-                console.log(err);
-                return res.sendStatus(403);
-            }
-            req.body.accountId = tokenData.accountId;
-            next();
-        });
-    }
-
-    // use in this service only
-    authenticateAdminToken(req, res, next) {
-        const authHeader = req.headers['authorization'];
-        const token = authHeader && authHeader.split(' ')[1];
-        if (token == null) return res.sendStatus(401);
-
-        jwt.verify(token, process.env.SECRET_TOKEN_KEY, (err, tokenData) => {
-            if (err) {
-                console.log(err);
-                return res.sendStatus(403);
-            }
-            if (tokenData.role != 1) {
-                console.log('Admin required!');
-                return res.sendStatus(403);
-            }
-            req.body.accountId = tokenData.accountId;
-            req.body.tokenData = tokenData;
-            next();
-        });
-    }
-
-    //[GET] /testCheckAdmin
-    checkAdmin(req, res) {
-        res.json({ msg: 'Admin okay' });
-    }
-
-    //[GET] /testCheckAdmin
-    checkAuth(req, res) {
-        res.json({ msg: 'Auth okay' });
-    }
-
-    // [GET] /validateToken
-    // use for another service
-    validateToken(req, res) {
-        console.log(`${Date().toLocaleString()} Validate token called`);
-        const authHeader = req.headers['authorization'];
-        const token = authHeader && authHeader.split(' ')[1];
-        if (token == null) {
-            console.log('No token');
-            return res.status(401).send({ msg: 'Token is required' });
+        const refreshToken = authHeader && authHeader.split(' ')[1];
+        if (refreshToken == null) return res.sendStatus(401);
+        const { err, accessToken } = await this.getNewAccessToken(refreshToken);
+        if (err) {
+            return res.status(403).json({ err });
         }
+        res.status(200).json({ accessToken });
+    };
 
-        jwt.verify(token, process.env.SECRET_TOKEN_KEY, (err, tokenData) => {
-            if (err) {
-                console.error('Token verification failed:', err);
-                return res.status(403).send({ msg: 'Invalid token' });
-            }
-            // Trả về accountId nếu token hợp lệ
-            console.log('Access token valid');
-            res.status(200).send({ accountId: tokenData.accountId });
-        });
+    //[GET]
+    checkAccess(req, res) {
+        res.status(200).json({ msg: 'Okay' });
     }
 }
 
-module.exports = new TokenController();
+export default new TokenController();

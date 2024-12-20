@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const saltRound = 10;
 const refreshTokenSchema = new mongoose.Schema({
@@ -40,4 +40,4 @@ const findHashedToken = async function (plainToken) {
     return null; // No match found
 };
 
-module.exports = { RefreshToken, findHashedToken };
+export { RefreshToken, findHashedToken };
