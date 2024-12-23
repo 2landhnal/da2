@@ -1,6 +1,6 @@
+"use strict"
 import Account from '../models/account.js';
 import tokenController from './tokenController.js';
-import jwt from 'jsonwebtoken';
 
 class AccountController {
     // [POST] /login

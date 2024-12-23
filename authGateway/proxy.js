@@ -1,3 +1,4 @@
+"use strict";
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import {
     authMiddleware,

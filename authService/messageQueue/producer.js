@@ -1,3 +1,4 @@
+"use strict"
 import { getChannel } from './connect.js';
 
 export const sendToQueue = (queue, message) => {

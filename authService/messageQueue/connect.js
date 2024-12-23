@@ -1,3 +1,4 @@
+"use strict"
 import amqp from 'amqplib';
 
 let channel;

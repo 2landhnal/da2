@@ -1,3 +1,4 @@
+"use strict";
 import admin from 'firebase-admin';
 import serviceAccount from './firebase-adminsdk.json' with { type: "json" };;
 

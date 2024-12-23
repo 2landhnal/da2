@@ -1,3 +1,4 @@
+"use strict"
 import express from 'express';
 import openRoute from './openRoute.js';
 import authRequiredRoute from './authRequired/index.js';

@@ -1,3 +1,4 @@
+"use strict";
 import rateLimit from 'express-rate-limit';
 
 const setupRateLimit = (app, routes) => {

@@ -1,4 +1,4 @@
-import express from 'express';
+"use strict"
 export const tokenDataMiddleware = (req, res, next) => {
     const tokenDataHeader = req.headers['x-token-data'];
     if (tokenDataHeader) {
