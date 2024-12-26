@@ -18,8 +18,13 @@ const accountSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
-
+        role: {
+            type: String,
+            enum: Object.values(RoleCode),
+            required: true,
+        },
         salt: { type: String, required: true },
+
         accountStatus: {
             type: String,
             enum: Object.values(AccountStatus),
@@ -30,11 +35,6 @@ const accountSchema = new mongoose.Schema(
         uid: { type: String, required: true, unique: true },
         avatar: { type: String, default: '' },
         fullname: { type: String, default: '' },
-        role: {
-            type: String,
-            enum: Object.values(RoleCode),
-            required: true,
-        },
     },
     {
         collection: COLLECTION_NAME,
