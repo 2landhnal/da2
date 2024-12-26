@@ -1,8 +1,8 @@
-"use strict"
+'use strict';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import AccountStatus from '../utils/accountStatus';
-import { roleCode } from '../utils/roleCode';
+import { AccountStatus } from '../utils/accountStatus.js';
+import { RoleCode } from '../utils/roleCode.js';
 
 const DOCUMENT_NAME = 'Account';
 const COLLECTION_NAME = 'Accounts';
@@ -16,6 +16,7 @@ const accountSchema = new mongoose.Schema(
         email: {
             type: String,
             required: true,
+            unique: true,
         },
 
         salt: { type: String, required: true },
@@ -26,12 +27,12 @@ const accountSchema = new mongoose.Schema(
         },
 
         // overlap
-        uid: { type: String, required: true },
+        uid: { type: String, required: true, unique: true },
         avatar: { type: String, default: '' },
         fullname: { type: String, default: '' },
         role: {
-            type: Number,
-            enum: Object.values(roleCode),
+            type: String,
+            enum: Object.values(RoleCode),
             required: true,
         },
     },
@@ -41,11 +42,10 @@ const accountSchema = new mongoose.Schema(
     },
 );
 
-async function getHashedPassword(plainPassword) {
+async function getHashedPassword(plainPassword, salt) {
     // --------------------------------------------------
     // Mã hóa mật khẩu
     // --------------------------------------------------
-    const salt = this.salt;
     const hashedPassword = await bcrypt.hash(plainPassword, salt);
     return hashedPassword;
 }
@@ -66,7 +66,7 @@ accountSchema.pre('save', async function (next) {
         return next();
     }
     console.log('modified');
-    this.password = await getHashedPassword(this.password);
+    this.password = await getHashedPassword(this.password, this.salt);
     console.log('hashed');
     next();
 });

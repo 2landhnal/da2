@@ -1,6 +1,6 @@
 'use strict';
 
-const { StatusCodes, ReasonPhrases } = require('../utils/httpStatusCode');
+import { StatusCodes, ReasonPhrases } from '../utils/httpStatusCode.js';
 
 const StatusCode = { ...StatusCodes };
 

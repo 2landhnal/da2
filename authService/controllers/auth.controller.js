@@ -1,6 +1,6 @@
 'use strict';
-import { CREATED, SuccessResponse } from '../responses/success.response';
-import { AuthService } from '../services/auth.service';
+import { CREATED, SuccessResponse } from '../responses/success.response.js';
+import { AuthService } from '../services/auth.service.js';
 class AuthController {
     register = async (req, res, next) => {
         new CREATED({
@@ -9,3 +9,5 @@ class AuthController {
         }).send(res);
     };
 }
+
+export const authController = new AuthController();

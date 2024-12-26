@@ -1,6 +1,3 @@
-import { ReasonPhrases } from './reasonPhrases';
-import { StatusCodes } from './statusCodes';
-export default {
-    StatusCodes,
-    ReasonPhrases,
-};
+import { ReasonPhrases } from './reasonPhrases.js';
+import { StatusCodes } from './statusCodes.js';
+export { StatusCodes, ReasonPhrases };

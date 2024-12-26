@@ -1,7 +1,7 @@
-"use strict"
+'use strict';
 import amqp from 'amqplib';
-import { setupConsumers } from './consumer';
-import { setupProducers } from './producer';
+import { setupConsumers } from './consumer.js';
+import { setupProducers } from './producer.js';
 
 let channel;
 

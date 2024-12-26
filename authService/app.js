@@ -1,3 +1,4 @@
+'use strict';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -5,9 +6,11 @@ import express from 'express';
 import cors from 'cors';
 import router from './routes/index.js';
 import { connectRabbitMQ } from './config/messageQueue/connect.js';
-import { setUpMongoose } from './config/mongo/index.js';
+import { connectMongoose } from './config/mongo/index.js';
 import { firestore, bucket } from './config/firebase/index.js';
+import { connectRedis } from './config/redis/index.js';
 import compression from 'compression';
+import bodyParser from 'body-parser';
 
 const app = express();
 
@@ -52,7 +55,7 @@ app.use((error, req, res, next) => {
 });
 
 // mongoDB
-await setUpMongoose();
+await connectMongoose();
 
 // connectMQ
 await connectRabbitMQ();
@@ -61,5 +64,8 @@ await connectRabbitMQ();
 if (firestore && bucket) {
     1 + 1;
 }
+
+// redis
+await connectRedis();
 
 export default app;

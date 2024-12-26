@@ -1,5 +1,4 @@
-export const sendToQueue = (queue, message) => {
-    const channel = getChannel();
+export const sendToQueue = (channel, queue, message) => {
     channel.sendToQueue(queue, Buffer.from(message), {
         persistent: true,
     });
@@ -15,7 +14,7 @@ export async function setupProducers(channel) {
             console.log(`Ready to produce to queue [${queue}]`);
         }
 
-        sendToQueue('testMQ', 'Hello world from MQ producer!');
+        sendToQueue(channel, 'testMQ', 'Hello world from MQ producer!');
     } catch (err) {
         console.error('Error setting up consumers:', err);
     }

@@ -1,5 +1,5 @@
 'use strict';
-const Joi = require('joi');
+import Joi from 'joi';
 
 class AccountValidate {
     static accountRegisterSchema = Joi.object({
@@ -14,6 +14,7 @@ class AccountValidate {
                 'string.pattern.base':
                     'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.',
             }),
+        role: Joi.string().required(),
     });
 
     static accountLoginSchema = Joi.object({
