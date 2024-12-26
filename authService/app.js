@@ -8,7 +8,7 @@ import router from './routes/index.js';
 import { connectRabbitMQ } from './config/messageQueue/connect.js';
 import { connectMongoose } from './config/mongo/index.js';
 import { firestore, bucket } from './config/firebase/index.js';
-import { connectRedis } from './config/redis/index.js';
+import { redisClient } from './config/redis/index.js';
 import compression from 'compression';
 import bodyParser from 'body-parser';
 
@@ -54,18 +54,19 @@ app.use((error, req, res, next) => {
     });
 });
 
-// mongoDB
-await connectMongoose();
+const startApp = async () => {
+    // mongoDB
+    await connectMongoose();
 
-// connectMQ
-await connectRabbitMQ();
+    // connectMQ
+    await connectRabbitMQ();
 
-// firebase
-if (firestore && bucket) {
-    1 + 1;
-}
+    // firebase
+    if (firestore && bucket) {
+        1 + 1;
+    }
+};
 
-// redis
-await connectRedis();
+startApp();
 
 export default app;

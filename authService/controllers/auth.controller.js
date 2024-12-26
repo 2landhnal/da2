@@ -8,6 +8,13 @@ class AuthController {
             metadata: await AuthService.register(req.body),
         }).send(res);
     };
+
+    login = async (req, res, next) => {
+        new SuccessResponse({
+            message: 'Login successfully!',
+            metadata: await AuthService.login(req.body),
+        }).send(res);
+    };
 }
 
 export const authController = new AuthController();

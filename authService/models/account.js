@@ -50,15 +50,6 @@ async function getHashedPassword(plainPassword, salt) {
     return hashedPassword;
 }
 
-accountSchema.methods.comparePassword = async function (plainPassword) {
-    if (!this.password || !this.salt) {
-        throw new Error('Password or salt not found on document');
-    }
-    // Hash lại plainPassword với salt từ tài liệu
-    const hashedPassword = await getHashedPassword(plainPassword);
-    return hashedPassword === this.password;
-};
-
 accountSchema.pre('save', async function (next) {
     console.log('presave');
     if (!this.isModified('password')) {
