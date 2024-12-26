@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { publicRoutes, privateRoutes } from './routes';
-import CheckTokenRoute from './utils/checkTokenRoute';
+import PreRoute from './routes/preRoute';
 import DefaultLayout from './layouts';
 // Bootstrap CSS
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -21,14 +21,14 @@ function App() {
                         } else if (route.layout === null) {
                             Layout = Fragment;
                         }
-                        const Page = route.component;
+                        // const Page = PreRoute(route);
                         return (
                             <Route
                                 path={route.path}
                                 key={index}
                                 element={
                                     <Layout>
-                                        <Page />
+                                        <PreRoute {...route} />
                                     </Layout>
                                 }
                             />
@@ -42,15 +42,15 @@ function App() {
                         } else if (route.layout === null) {
                             Layout = Fragment;
                         }
+                        // const Page = PreRoute(route);
                         return (
                             <Route
                                 key={index}
                                 path={route.path}
                                 element={
-                                    <CheckTokenRoute
-                                        route={route}
-                                        Layout={Layout}
-                                    />
+                                    <Layout>
+                                        <PreRoute {...route} />
+                                    </Layout>
                                 }
                             />
                         );

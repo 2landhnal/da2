@@ -1,42 +1,62 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import AccountStatus from '../utils/accountStatus';
+import { roleCode } from '../utils/roleCode';
 
-const saltRound = 10;
+const DOCUMENT_NAME = 'Account';
+const COLLECTION_NAME = 'Accounts';
 
-const validateEmail = function (email) {
-    var re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    return re.test(email);
-};
+const accountSchema = new mongoose.Schema(
+    {
+        password: {
+            type: String,
+            required: true,
+        },
+        email: {
+            type: String,
+            required: true,
+        },
 
-const accountSchema = new mongoose.Schema({
-    password: {
-        type: String,
-        required: true,
+        salt: { type: String, required: true },
+        accountStatus: {
+            type: String,
+            enum: Object.values(AccountStatus),
+            default: AccountStatus.ACTIVE,
+        },
+
+        // overlap
+        uid: { type: String, required: true },
+        avatar: { type: String, default: '' },
+        fullname: { type: String, default: '' },
+        role: {
+            type: Number,
+            enum: Object.values(roleCode),
+            required: true,
+        },
     },
-    email: {
-        type: String,
-        trim: true,
-        lowercase: true,
-        unique: true,
-        required: 'Email address is required',
-        validate: [validateEmail, 'Please fill a valid email address'],
-        match: [
-            /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-            'Please fill a valid email address',
-        ],
+    {
+        collection: COLLECTION_NAME,
+        timestamp: true,
     },
-    role: {
-        type: Number,
-        default: 3,
-    },
-    // 1: admin
-    // 2: teacher
-    // 3: student
-});
+);
 
-async function hashWithSalt(password, saltRound) {
-    return bcrypt.hash(password, saltRound);
+async function getHashedPassword(plainPassword) {
+    // --------------------------------------------------
+    // Mã hóa mật khẩu
+    // --------------------------------------------------
+    const salt = this.salt;
+    const hashedPassword = await bcrypt.hash(plainPassword, salt);
+    return hashedPassword;
 }
+
+accountSchema.methods.comparePassword = async function (plainPassword) {
+    if (!this.password || !this.salt) {
+        throw new Error('Password or salt not found on document');
+    }
+    // Hash lại plainPassword với salt từ tài liệu
+    const hashedPassword = await getHashedPassword(plainPassword);
+    return hashedPassword === this.password;
+};
 
 accountSchema.pre('save', async function (next) {
     console.log('presave');
@@ -45,13 +65,9 @@ accountSchema.pre('save', async function (next) {
         return next();
     }
     console.log('modified');
-    this.password = await hashWithSalt(this.password, saltRound);
+    this.password = await getHashedPassword(this.password);
     console.log('hashed');
     next();
 });
 
-accountSchema.methods.comparePassword = async function (password) {
-    return bcrypt.compare(password, this.password);
-};
-
-export default mongoose.model('Account', accountSchema);
+export default mongoose.model(DOCUMENT_NAME, accountSchema);

@@ -1,5 +1,6 @@
 import classNames from 'classnames/bind';
 import { post } from './httpRequests.js';
+import { authUrl } from '../config/index.js';
 // import jwt from 'jsonwebtoken';
 
 export function classCombine(names, cx) {
@@ -15,16 +16,14 @@ export const isAccessTokenExpired = () =>
     Date.now() >=
     JSON.parse(atob(localStorage.getItem('accessToken').split('.')[1])).exp *
         1000;
-
 export const checkCredential = async () => {
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
-    const prod = false;
 
-    if (!prod) {
+    if (!accessToken || !refreshToken) {
+        console.log('No token found');
         return false;
     }
-
     if (isTokenExpired(accessToken)) {
         console.log('Access token expired, trying to get a new one');
         try {
@@ -34,20 +33,24 @@ export const checkCredential = async () => {
                 },
             };
             const response = await post(
-                process.env.REACT_APP_AUTH_URL,
+                authUrl,
                 '/refreshAccessToken',
                 {},
                 options,
             );
-            localStorage.setItem('accessToken', response.accessToken);
-            console.log('Get new token success');
-            return true; // Token refreshed successfully
+            if (response.accessToken) {
+                localStorage.setItem('accessToken', response.accessToken);
+                console.log('Get new token success');
+                return true; // Token refreshed successfully
+            }
+            console.log('Get new token failed');
+            return false;
         } catch (error) {
             console.error('Error refreshing token:', error);
             return false; // Failed to refresh token
         }
     } else {
         console.log('Access token valid');
-        return true; // Token is valid
+        return true;
     }
 };

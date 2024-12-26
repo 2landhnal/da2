@@ -1,5 +1,3 @@
-import { getChannel } from './connect.js';
-
 export const sendToQueue = (queue, message) => {
     const channel = getChannel();
     channel.sendToQueue(queue, Buffer.from(message), {
@@ -8,9 +6,8 @@ export const sendToQueue = (queue, message) => {
     console.log(`[x] Sent: ${message}`);
 };
 
-export async function setupProducers() {
+export async function setupProducers(channel) {
     try {
-        const channel = getChannel();
         const producerQueues = ['testMQ'];
 
         for (const queue of producerQueues) {

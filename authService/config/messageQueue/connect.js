@@ -1,4 +1,6 @@
 import amqp from 'amqplib';
+import { setupConsumers } from './consumer';
+import { setupProducers } from './producer';
 
 let channel;
 
@@ -13,7 +15,8 @@ export async function connectRabbitMQ() {
         console.log(
             `RabbitMQ connected and channel created. Allow max ${maxPrefetch} messages processing at a time`,
         );
-        console.log('[AuthService] is waiting for messages...');
+        await setupProducers(channel);
+        await setupConsumers(channel);
 
         // Graceful shutdown
         process.on('SIGINT', async () => {

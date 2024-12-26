@@ -1,9 +1,7 @@
-import { getChannel } from './connect.js';
 import accountController from '../controllers/accountController.js';
 
-export async function setupConsumers() {
+export async function setupConsumers(channel) {
     try {
-        const channel = getChannel();
         const consumeQueues = ['testMQ', 'signUpAccount'];
 
         for (const queue of consumeQueues) {
