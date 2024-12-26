@@ -5,7 +5,6 @@ import User from '../pages/User';
 import Error from '../pages/Error';
 import Schedule from '../pages/Schedule';
 import { HeaderOnly } from '../layouts';
-import config from '../config';
 import Registration from '../pages/Registration';
 import Semester from '../pages/Semester';
 
@@ -43,4 +42,4 @@ const privateRoutes = [
     { path: routePath.semester, component: Semester },
 ];
 
-export { privateRoutes, publicRoutes };
+export { privateRoutes, publicRoutes, routePath };

@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 import logo from '../../assets/images/logo.png';
 import { classCombine } from '../../utils/helper';
 import { Link, NavLink } from 'react-router-dom';
-import config from '../../config';
+import { routePath } from '../../routes';
 import { isAccessTokenExpired } from '../../utils/helper';
 import { useEffect } from 'react';
 
@@ -19,32 +19,32 @@ function Header() {
         <header className={cx('header-area', 'header-sticky')}>
             <ul className={cx('ul-container')}>
                 <li>
-                    <Link to={config.routes.home} className="active">
+                    <Link to={routePath.home} className="active">
                         Home
                     </Link>
                 </li>
                 <li>
-                    <Link to={config.routes.login} className="active">
+                    <Link to={routePath.login} className="active">
                         Login
                     </Link>
                 </li>
                 <li>
-                    <Link to={config.routes.user} className="active">
+                    <Link to={routePath.user} className="active">
                         User
                     </Link>
                 </li>
                 <li>
-                    <Link to={config.routes.schedule} className="active">
+                    <Link to={routePath.schedule} className="active">
                         Schedule
                     </Link>
                 </li>
                 <li>
-                    <Link to={config.routes.semester} className="active">
+                    <Link to={routePath.semester} className="active">
                         Semester
                     </Link>
                 </li>
                 <li>
-                    <Link to={config.routes.registration} className="active">
+                    <Link to={routePath.registration} className="active">
                         Registration
                     </Link>
                 </li>

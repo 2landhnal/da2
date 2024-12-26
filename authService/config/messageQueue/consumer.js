@@ -1,3 +1,5 @@
+'use strict';
+import { getChannel } from './connect.js';
 import accountController from '../controllers/accountController.js';
 
 export async function setupConsumers(channel) {

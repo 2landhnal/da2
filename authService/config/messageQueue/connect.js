@@ -1,3 +1,4 @@
+"use strict"
 import amqp from 'amqplib';
 import { setupConsumers } from './consumer';
 import { setupProducers } from './producer';

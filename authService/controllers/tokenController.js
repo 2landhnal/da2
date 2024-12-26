@@ -1,3 +1,4 @@
+"use strict"
 import jwt from 'jsonwebtoken';
 import { RefreshToken, findHashedToken } from '../models/refreshToken.js';
 

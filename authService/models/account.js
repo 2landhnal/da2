@@ -1,3 +1,4 @@
+"use strict"
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import AccountStatus from '../utils/accountStatus';
