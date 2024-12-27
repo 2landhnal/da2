@@ -1,6 +1,4 @@
-import { getredisClientent } from '../config/redis';
-
-const redisClient = await getredisClientent();
+import { redisClient } from '../config/redis/index.js';
 
 export const tryGetFromCache = async (key, expireTimeInMinute, callback) => {
     try {

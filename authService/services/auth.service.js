@@ -5,6 +5,10 @@ import { createTokenPair } from '../helpers/hash.js';
 import {
     pushToList,
     valueExistsInList,
+    valueExistInHashedList,
+    removeRefreshToken,
+    saveRefreshToken,
+    isRefreshTokenValid,
 } from '../models/repositories/redis.repo.js';
 import {
     BadRequestError,
@@ -17,6 +21,7 @@ import {
 } from '../models/repositories/account.repo.js';
 import { getInfoData } from '../utils/index.js';
 import { genSalt } from '../helpers/hash.js';
+import jwt from 'jsonwebtoken';
 
 export class AuthService {
     static register = async ({
@@ -57,12 +62,10 @@ export class AuthService {
         const salt = await genSalt();
         const newAccount = await createAccount({ ...userInput, salt });
         return {
-            metadata: {
-                account: getInfoData({
-                    fileds: ['uid', 'email', 'role'],
-                    object: newAccount,
-                }),
-            },
+            account: getInfoData({
+                fileds: ['uid', 'email', 'role'],
+                object: newAccount,
+            }),
         };
     };
 
@@ -70,10 +73,8 @@ export class AuthService {
         const userInput = { email, password };
 
         // validate
-        const { error, value } = AccountValidate.accountLoginSchema.validate({
-            email,
-            password,
-        });
+        const { error, value } =
+            AccountValidate.accountLoginSchema.validate(userInput);
         if (error) {
             throw new BadRequestError(error.details[0].message);
         }
@@ -96,22 +97,35 @@ export class AuthService {
         };
         const { refreshToken, accessToken } = await createTokenPair(payload);
         // store token in cache
-        const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-        await pushToList(`refreshTokenList:${email}`, hashedRefreshToken);
+        await saveRefreshToken(email, refreshToken);
         // send token
         return {
-            metadata: {
-                accessToken,
-                refreshToken,
-            },
+            accessToken,
+            refreshToken,
         };
     };
 
-    static refreshTokenOkay = async ({ token }) => {
-        return {
-            metadata: {
-                token,
-            },
-        };
+    static logout = async ({ token }) => {
+        const payload = await jwt.decode(token);
+        const { email } = payload;
+        const isValid = await isRefreshTokenValid(token);
+        if (!isValid) {
+            throw new AuthFailureError();
+        }
+
+        const removed = await removeRefreshToken(email, token);
+        if (!removed) {
+            throw new BadRequestError();
+        }
+        // remove from cookie
+        return {};
+    };
+
+    static checkRefreshToken = async ({ token }) => {
+        const isValid = await isRefreshTokenValid(token);
+        if (!isValid) {
+            throw new AuthFailureError();
+        }
+        return {};
     };
 }
