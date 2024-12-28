@@ -1,35 +1,27 @@
 'use strict';
 
+import {
+    AuthFailureError,
+    NotFoundError,
+} from '../responses/error.response.js';
+import { asyncHandler } from '../helpers/asyncHandler.js';
+import { RoleCode } from '../utils/roleCode.js';
 import jwt from 'jsonwebtoken';
-import { AuthFailureError, NotFoundError } from '../responses/error.response';
-import asyncHandler from '../../helpers/asyncHandler';
 
 const HEADER = {
-    API_KEY: 'x-api-key',
-    CLIENT_ID: 'client-id',
     AUTHORIZATION: 'authorization',
-    REFRESHTOKEN: 'rtoken-id',
 };
 
-const createTokenPair = async (payload, accessKey, refreshKey) => {
-    try {
-        const accessToken = await jwt.sign(payload, accessKey, {
-            expiresIn: '2 days',
-        });
-        const refreshToken = await jwt.sign(payload, refreshKey, {
-            expiresIn: '7 days',
-        });
-
-        jwt.verify(accessToken, accessKey, (err, decode) => {
-            if (err) {
-                console.error('error verify', err);
-            } else {
-                // console.log("decode verify", decode);
-            }
-        });
-        return { accessToken, refreshToken };
-    } catch (error) {}
-};
+export const bdtRequired = asyncHandler(async (req, res, next) => {
+    const payload = await jwt.decode(
+        req.headers[HEADER.AUTHORIZATION].split(' ')[1],
+    );
+    const { role } = payload;
+    if (role != RoleCode.BDT) {
+        throw new AuthFailureError(error.details[0].message);
+    }
+    return next();
+});
 
 const authentication = asyncHandler(async (req, res, next) => {
     const user_id = req.headers[HEADER.CLIENT_ID];
@@ -116,8 +108,4 @@ const authentication = asyncHandler(async (req, res, next) => {
     }
 });
 
-const verifyjwt = async (token, keySecret) => {
-    return await jwt.verify(token, keySecret);
-};
-
-export { createTokenPair, authentication, verifyjwt };
+export { authentication };

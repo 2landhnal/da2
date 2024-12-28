@@ -5,9 +5,4 @@ import { asyncHandler } from '../helpers/asyncHandler.js';
 
 const router = express.Router();
 
-router.get(
-    '/checkRefreshToken/:token',
-    asyncHandler(authController.checkRefreshToken),
-);
-
 export default router;

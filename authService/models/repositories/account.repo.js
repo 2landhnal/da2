@@ -29,13 +29,12 @@ export const queryAccount = async ({ page, resultPerPage, query }) => {
         const skip = (currentPage - 1) * resultsPerPage;
 
         // Parse the query string (e.g., "Accountrname=abc") into a MongoDB query object
-        const queryObject = query
-            ? query.split('&').reduce((acc, pair) => {
-                  const [key, value] = pair.split('=');
-                  acc[key] = value;
-                  return acc;
-              }, {})
-            : {};
+        let queryObject = {};
+        for (const field in query) {
+            if (query[field]) {
+                queryObject[field] = { $regex: query[field], $options: 'i' }; // 'i' để tìm kiếm không phân biệt hoa thường
+            }
+        }
 
         // Execute query with pagination
         const foundAccounts = await Account.find(queryObject)

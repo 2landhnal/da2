@@ -27,15 +27,12 @@ class RedisClient {
         }
     }
 
-    static async getInstance() {
+    static getInstance() {
         if (!RedisClient.instance) {
             RedisClient.instance = new RedisClient();
-            while (!RedisClient.instance.connected) {
-                await new Promise((resolve) => setTimeout(resolve, 10)); // Đợi kết nối hoàn thành
-            }
         }
         return RedisClient.instance;
     }
 }
 
-export const redisClient = (await RedisClient.getInstance()).redisCli;
+export const redisClient = RedisClient.getInstance().redisCli;

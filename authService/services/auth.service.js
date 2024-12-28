@@ -1,7 +1,12 @@
 'use strict';
 import AccountValidate from '../validate/account.validate.js';
 import bcrypt from 'bcryptjs';
-import { createTokenPair } from '../helpers/hash.js';
+import {
+    createAccessToken,
+    createTokenPair,
+    verifyAccessToken,
+    verifyRefreshToken,
+} from '../helpers/hash.helper.js';
 import {
     pushToList,
     valueExistsInList,
@@ -18,9 +23,10 @@ import {
     createAccount,
     findAccountrWithEmail,
     findAccountrWithUid,
+    queryAccount,
 } from '../models/repositories/account.repo.js';
 import { getInfoData } from '../utils/index.js';
-import { genSalt } from '../helpers/hash.js';
+import { genSalt } from '../helpers/hash.helper.js';
 import jwt from 'jsonwebtoken';
 
 export class AuthService {
@@ -105,15 +111,15 @@ export class AuthService {
         };
     };
 
-    static logout = async ({ token }) => {
-        const payload = await jwt.decode(token);
+    static logout = async ({ refreshToken }) => {
+        const payload = await jwt.decode(refreshToken);
         const { email } = payload;
-        const isValid = await isRefreshTokenValid(token);
+        const isValid = await isRefreshTokenValid(refreshToken);
         if (!isValid) {
             throw new AuthFailureError();
         }
 
-        const removed = await removeRefreshToken(email, token);
+        const removed = await removeRefreshToken(email, refreshToken);
         if (!removed) {
             throw new BadRequestError();
         }
@@ -121,9 +127,47 @@ export class AuthService {
         return {};
     };
 
-    static checkRefreshToken = async ({ token }) => {
-        const isValid = await isRefreshTokenValid(token);
+    static search = async ({ page, resultPerPage, query }) => {
+        const result = await queryAccount({ page, resultPerPage, query });
+        // remove from cookie
+        return result;
+    };
+
+    static refreshAccessToken = async ({ token }) => {
+        const payload = await jwt.decode(token);
+        const { email } = payload;
+
+        // token stored in db
+        const existInList = await isRefreshTokenValid(token);
+        if (!existInList) {
+            throw new AuthFailureError();
+        }
+
+        // token expired
+        const isValid = await verifyRefreshToken(token);
         if (!isValid) {
+            await removeRefreshToken(email, token);
+            throw new AuthFailureError();
+        }
+
+        const { accessToken } = await createAccessToken(payload);
+        return { accessToken };
+    };
+
+    static checkRefreshToken = async ({ token }) => {
+        const payload = await jwt.decode(token);
+        const { email } = payload;
+
+        // token stored in db
+        const existInList = await isRefreshTokenValid(token);
+        if (!existInList) {
+            throw new AuthFailureError();
+        }
+
+        // token expired
+        const isValid = await verifyRefreshToken(token);
+        if (!isValid) {
+            await removeRefreshToken(email, token);
             throw new AuthFailureError();
         }
         return {};

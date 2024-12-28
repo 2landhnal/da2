@@ -1,6 +1,7 @@
 'use strict';
 import { CREATED, SuccessResponse } from '../responses/success.response.js';
 import { AuthService } from '../services/auth.service.js';
+import { REFRESHTOKEN_COOKIE_TIME } from '../config/const.config.js';
 class AuthController {
     register = async (req, res, next) => {
         new CREATED({
@@ -15,7 +16,7 @@ class AuthController {
             httpOnly: true, // Bảo vệ cookie khỏi bị truy cập từ JavaScript
             secure: process.env.nodeEnv === 'production', // Chỉ sử dụng HTTPS trong môi trường production
             sameSite: 'strict', // Bảo vệ chống CSRF
-            maxAge: 7 * 24 * 60 * 60 * 1000, // Thời gian tồn tại của cookie (7 ngày)
+            maxAge: REFRESHTOKEN_COOKIE_TIME, // Thời gian tồn tại của cookie
         });
         new SuccessResponse({
             message: 'Login successfully!',
@@ -24,10 +25,10 @@ class AuthController {
     };
 
     logout = async (req, res, next) => {
-        const metadata = await AuthService.logout(req.body);
+        const metadata = await AuthService.logout(req.cookies);
         res.clearCookie('refreshToken', {
             httpOnly: true,
-            secure: false, // Chuyển thành true nếu dùng HTTPS
+            secure: process.env.nodeEnv === 'production', // Chuyển thành true nếu dùng HTTPS
             sameSite: 'Strict',
         });
         new SuccessResponse({
@@ -36,10 +37,21 @@ class AuthController {
         }).send(res);
     };
 
-    checkRefreshToken = async (req, res, next) => {
+    search = async (req, res, next) => {
+        const metadata = await AuthService.search(req.body);
         new SuccessResponse({
-            message: 'Refresh token valid!',
-            metadata: await AuthService.checkRefreshToken(req.params),
+            message: 'Search successfully!',
+            metadata,
+        }).send(res);
+    };
+
+    refreshAccessToken = async (req, res, next) => {
+        const { refreshToken } = req.cookies;
+        new SuccessResponse({
+            message: 'Refresh access token successfully!',
+            metadata: await AuthService.refreshAccessToken({
+                token: refreshToken,
+            }),
         }).send(res);
     };
 }

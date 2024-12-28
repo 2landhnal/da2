@@ -5,10 +5,11 @@ import testRouter from './test.router.js';
 
 const router = express.Router();
 
-router.use('/v1/api/auth', accountRouter);
+router.use('/v1/api', accountRouter);
 router.use('/test', testRouter);
 
 router.get('/healthCheck', (req, res, next) => {
+    console.log(req.cookies);
     res.status(200).send({ msg: 'Auth service' });
 });
 

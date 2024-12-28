@@ -34,6 +34,7 @@ export const valueExistsInList = async (listKey, value) => {
 
 export const valueExistInHashedList = async (listKey, plain) => {
     const listValues = await redisClient.lRange(listKey, 0, -1);
+    console.log({ listValues });
     for (const value of listValues) {
         const same = await bcrypt.compare(plain, value);
         if (same) return true;
@@ -65,6 +66,7 @@ export const removeRefreshToken = async (email, token) => {
         const isMatch = await bcrypt.compare(token, hashedToken);
         if (isMatch) {
             await redisClient.lRem(`refreshToken:${email}`, 1, hashedToken);
+            console.log(`Removed ${hashedToken}`);
             return true;
         }
     }

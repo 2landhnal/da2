@@ -11,10 +11,12 @@ import { firestore, bucket } from './config/firebase/index.js';
 import { redisClient } from './config/redis/index.js';
 import compression from 'compression';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+app.use(cookieParser());
 app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
