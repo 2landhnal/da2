@@ -32,7 +32,7 @@ import { nameToPrefix } from '../helpers/student.helper.js';
 import Student from '../models/student.model.js';
 import { RoleCode } from '../utils/roleCode.js';
 
-export class AuthService {
+export class StudentService {
     static register = async ({
         fullname,
         personalEmail,
@@ -107,9 +107,43 @@ export class AuthService {
         return { newStudent };
     };
 
-    static search = async ({ page, resultPerPage, query }) => {
-        const result = await queryStudent({ page, resultPerPage, query });
+    static search = async ({ page, resultPerPage, query, role }) => {
+        // validate
+        page = page || 1;
+        resultPerPage = resultPerPage || 10;
+
+        // query
+        let students = await queryStudent({ page, resultPerPage, query });
+
+        // filter
+        students = students.map((student) => {
+            if (role != RoleCode.BCTSV) {
+                return getInfoData({
+                    fileds: ['uid', 'fullname', 'yoa', 'email', 'avatar'],
+                    object: student,
+                });
+            }
+            return student;
+        });
+        return {
+            students,
+            pagination: {
+                page,
+                resultPerPage,
+                totalResults: students.length,
+            },
+        };
+    };
+
+    static findByUid = async ({ uid, role }) => {
+        let student = await findStudentWithUid({ uid });
+        if (role != RoleCode.BCTSV) {
+            student = getInfoData({
+                fileds: ['uid', 'fullname', 'yoa', 'email', 'avatar'],
+                object: student,
+            });
+        }
         // remove from cookie
-        return result;
+        return { student };
     };
 }

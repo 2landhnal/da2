@@ -7,5 +7,7 @@ import { bctsvRequired } from '../middlewares/auth.middleware.js';
 const router = express.Router();
 
 router.post('/', bctsvRequired, asyncHandler(studentController.register));
+router.get('/search', asyncHandler(studentController.search));
+router.get('/:uid', asyncHandler(studentController.findByUid));
 
 export default router;

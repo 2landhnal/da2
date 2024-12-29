@@ -46,12 +46,8 @@ export const getNumberOfStudentWithYoa = async ({ yoa }) => {
 
 export const queryStudent = async ({ page, resultPerPage, query }) => {
     try {
-        // Ensure page and resultPerPage have default values if not provided
-        const currentPage = page || 1;
-        const resultsPerPage = resultPerPage || 10;
-
         // Skip calculation for pagination
-        const skip = (currentPage - 1) * resultsPerPage;
+        const skip = (page - 1) * resultPerPage;
 
         // Parse the query string (e.g., "Studentrname=abc") into a MongoDB query object
         let queryObject = {};
@@ -64,21 +60,10 @@ export const queryStudent = async ({ page, resultPerPage, query }) => {
         // Execute query with pagination
         const foundStudents = await Student.find(queryObject)
             .skip(skip)
-            .limit(resultsPerPage);
-
-        // Get the total count for the query
-        const totalStudents = await Student.countDocuments(queryObject);
+            .limit(resultPerPage);
 
         // Return paginated results and metadata
-        return {
-            students: foundStudents,
-            pagination: {
-                currentPage,
-                resultsPerPage,
-                totalResults: totalStudents,
-                totalPages: Math.ceil(totalStudents / resultsPerPage),
-            },
-        };
+        return foundStudents;
     } catch (error) {
         console.error('Error querying Students:', error);
         throw error;
