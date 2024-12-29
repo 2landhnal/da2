@@ -28,7 +28,7 @@ export const queryAccount = async ({ page, resultPerPage, query }) => {
         // Skip calculation for pagination
         const skip = (currentPage - 1) * resultsPerPage;
 
-        // Parse the query string (e.g., "Accountrname=abc") into a MongoDB query object
+        // Parse the query string (e.g., "Accountname=abc") into a MongoDB query object
         let queryObject = {};
         for (const field in query) {
             if (query[field]) {
@@ -70,7 +70,7 @@ export const deleteAccountByUid = async ({ uid }) => {
     }
 };
 
-export const findAccountrWithEmail = async ({ email }) => {
+export const findAccountWithEmail = async ({ email }) => {
     try {
         const found = await Account.findOne({ email });
         return found;
@@ -80,7 +80,7 @@ export const findAccountrWithEmail = async ({ email }) => {
     }
 };
 
-export const findAccountrWithUid = async ({ uid }) => {
+export const findAccountWithUid = async ({ uid }) => {
     try {
         const found = await Account.findOne({ uid });
         return found;

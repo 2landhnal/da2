@@ -21,13 +21,14 @@ import {
 } from '../responses/error.response.js';
 import {
     createAccount,
-    findAccountrWithEmail,
-    findAccountrWithUid,
+    findAccountWithEmail,
+    findAccountWithUid,
     queryAccount,
 } from '../models/repositories/account.repo.js';
 import { getInfoData } from '../utils/index.js';
 import { genSalt } from '../helpers/hash.helper.js';
 import jwt from 'jsonwebtoken';
+import { AccountStatus } from '../utils/accountStatus.js';
 
 export class AuthService {
     static register = async ({
@@ -46,21 +47,24 @@ export class AuthService {
         };
 
         // validate userInput
-        const { error, value } = AccountValidate.accountRegisterSchema.validate(
-            { email, password, uid, role },
-        );
+        const { error, value } = AccountValidate.accountegisterSchema.validate({
+            email,
+            password,
+            uid,
+            role,
+        });
         if (error) {
             throw new BadRequestError(error.details[0].message);
         }
 
         // Check username existed
-        let hoddedUser = await findAccountrWithEmail({ email });
+        let hoddedUser = await findAccountWithEmail({ email });
         if (hoddedUser) {
             throw new BadRequestError('Error: User already registered');
         }
 
         // Check uid existed
-        hoddedUser = await findAccountrWithUid({ uid });
+        hoddedUser = await findAccountWithUid({ uid });
         if (hoddedUser) {
             throw new BadRequestError('Error: User already registered');
         }
@@ -86,12 +90,18 @@ export class AuthService {
         }
 
         // check password
-        const account = await findAccountrWithEmail({ email });
+        const account = await findAccountWithEmail({ email });
         const salt = account.salt;
         const hashedPassword = await bcrypt.hash(password, salt);
         const valid = hashedPassword === account.password;
         if (!valid) {
             throw new AuthFailureError();
+        }
+
+        // check account closed
+        const { accountStatus } = account;
+        if (accountStatus === AccountStatus.CLOSED) {
+            throw new AuthFailureError('Account closed');
         }
 
         // generate token
@@ -100,6 +110,7 @@ export class AuthService {
             role: account.role,
             fullname: account.fullname || '',
             email: account.email,
+            avatar: account.avatar,
         };
         const { refreshToken, accessToken } = await createTokenPair(payload);
         // store token in cache
@@ -109,6 +120,40 @@ export class AuthService {
             accessToken,
             refreshToken,
         };
+    };
+
+    static changePassword = async ({ newPassword, uid }) => {
+        const userInput = { uid, password: newPassword };
+
+        // validate
+        const { error, value } =
+            AccountValidate.changePasswordSchema.validate(userInput);
+        if (error) {
+            throw new BadRequestError(error.details[0].message);
+        }
+
+        // check password
+        const account = await findAccountWithUid({ uid });
+        const salt = account.salt;
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        const same = hashedPassword === account.password;
+        if (same) {
+            throw new AuthFailureError(
+                'New password must be different from current password',
+            );
+        }
+
+        // check account closed
+        const { accountStatus } = account;
+        if (accountStatus === AccountStatus.CLOSED) {
+            throw new AuthFailureError('Account closed');
+        }
+
+        // store new password
+        account.password = newPassword;
+        await account.save();
+        // send token
+        return {};
     };
 
     static logout = async ({ refreshToken }) => {

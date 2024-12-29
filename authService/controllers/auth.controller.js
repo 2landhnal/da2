@@ -2,6 +2,7 @@
 import { CREATED, SuccessResponse } from '../responses/success.response.js';
 import { AuthService } from '../services/auth.service.js';
 import { REFRESHTOKEN_COOKIE_TIME } from '../config/const.config.js';
+import { HEADER } from '../middlewares/auth.middleware.js';
 class AuthController {
     register = async (req, res, next) => {
         new CREATED({
@@ -33,6 +34,17 @@ class AuthController {
         });
         new SuccessResponse({
             message: 'Logout successfully!',
+            metadata,
+        }).send(res);
+    };
+
+    changePassword = async (req, res, next) => {
+        const metadata = await AuthService.changePassword({
+            ...req.body,
+            uid: req.headers[HEADER.UID],
+        });
+        new SuccessResponse({
+            message: 'Chnage password successfully!',
             metadata,
         }).send(res);
     };
