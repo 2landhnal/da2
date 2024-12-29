@@ -2,15 +2,16 @@ import { publicRoutes, privateRoutes, routePath } from '.';
 import { checkCredential } from '../utils/helper';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useAuth } from './authProvider.route';
 
 function PreRoute(route) {
     const navigate = useNavigate();
-    const [authen, setAuthen] = useState(null); // Dùng để lưu trạng thái xác thực
+    const { auth, setAuth } = useAuth();
 
     useEffect(() => {
         const checkAuth = async () => {
             const isAuthenticated = await checkCredential();
-            setAuthen(isAuthenticated);
+            setAuth(isAuthenticated);
 
             const isPublicRoute = publicRoutes.some(
                 (r) => r.path === route.path,
@@ -27,9 +28,9 @@ function PreRoute(route) {
         };
 
         checkAuth(); // Gọi hàm bất đồng bộ
-    }, [navigate, route]);
+    }, [auth, navigate, route]);
 
-    if (authen === null) {
+    if (auth === null) {
         // Có thể hiển thị trạng thái loading trong lúc chờ
         return <div>Loading...</div>;
     }

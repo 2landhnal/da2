@@ -18,6 +18,7 @@ export async function connectRabbitMQ() {
         );
         await setupProducers(channel);
         await setupConsumers(channel);
+        sendToQueue('testMQ', 'Hello world from MQ producer!');
 
         // Graceful shutdown
         process.on('SIGINT', async () => {
@@ -36,4 +37,11 @@ export const getChannel = () => {
         throw new Error('Channel is not initialized yet');
     }
     return channel;
+};
+
+export const sendToQueue = (queue, message) => {
+    channel.sendToQueue(queue, Buffer.from(message), {
+        persistent: true,
+    });
+    console.log(`[x] Sent: ${message}`);
 };

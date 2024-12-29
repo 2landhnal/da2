@@ -11,13 +11,11 @@ import jwt from 'jsonwebtoken';
 export const HEADER = {
     AUTHORIZATION: 'authorization',
     UID: 'x-user-id',
+    ROLE: 'x-user-role',
 };
 
 export const bdtRequired = asyncHandler(async (req, res, next) => {
-    const payload = await jwt.decode(
-        req.headers[HEADER.AUTHORIZATION].split(' ')[1],
-    );
-    const { role } = payload;
+    const role = req.headers[HEADER.ROLE];
     if (role != RoleCode.BDT) {
         throw new AuthFailureError();
     }

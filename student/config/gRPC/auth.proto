@@ -1,0 +1,13 @@
+syntax = 'proto3';
+
+package authPakage;
+
+service AuthService {
+    rpc createAccount (Account) returns (Empty);
+}
+
+message Account {
+    string infor = 1;
+}
+
+message Empty {}

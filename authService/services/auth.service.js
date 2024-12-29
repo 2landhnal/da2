@@ -31,28 +31,24 @@ import jwt from 'jsonwebtoken';
 import { AccountStatus } from '../utils/accountStatus.js';
 
 export class AuthService {
-    static register = async ({
-        email,
-        password,
-        uid,
-        role,
-        personal_email,
-    }) => {
+    static register = async ({ email, password, uid, role, personalEmail }) => {
         const userInput = {
             email,
             password,
             uid,
             role,
-            personal_email,
+            personalEmail,
         };
 
         // validate userInput
-        const { error, value } = AccountValidate.accountegisterSchema.validate({
-            email,
-            password,
-            uid,
-            role,
-        });
+        const { error, value } = AccountValidate.accountRegisterSchema.validate(
+            {
+                email,
+                password,
+                uid,
+                role,
+            },
+        );
         if (error) {
             throw new BadRequestError(error.details[0].message);
         }

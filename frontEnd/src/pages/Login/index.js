@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
 import styles from './Auth.module.scss';
 import classNames from 'classnames/bind';
+import { useNavigate } from 'react-router-dom';
+import { authUrl } from '../../config';
+import { routePath } from '../../routes';
+import { fetchPost } from '../../utils/fetch.utils';
 
 const cx = classNames.bind(styles);
 
 function Auth() {
+    const navigate = useNavigate();
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [formData, setFormData] = useState({
         name: '',
@@ -12,6 +17,25 @@ function Auth() {
         password: '',
         confirmPassword: '',
     });
+
+    const handleLogin = async () => {
+        const email = formData.email;
+        const password = formData.password;
+        console.log('Login:', {
+            email,
+            password,
+        }); // fine hêre
+        let response = await fetchPost(
+            authUrl,
+            '/login',
+            JSON.stringify({ email, password }),
+            {},
+            true,
+        );
+        console.log(response);
+        localStorage.setItem('accessToken', response.metadata.accessToken);
+        navigate(routePath.home, { replace: true });
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -21,23 +45,24 @@ function Auth() {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSignUp = () => {
+        if (formData.password !== formData.confirmPassword) {
+            alert("Passwords don't match!");
+            return;
+        }
+        alert('Sign Up:', {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+        });
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (isLoginMode) {
-            console.log('Login:', {
-                email: formData.email,
-                password: formData.password,
-            });
+            await handleLogin();
         } else {
-            if (formData.password !== formData.confirmPassword) {
-                alert("Passwords don't match!");
-                return;
-            }
-            console.log('Sign Up:', {
-                name: formData.name,
-                email: formData.email,
-                password: formData.password,
-            });
+            handleSignUp();
         }
     };
 
@@ -52,13 +77,13 @@ function Auth() {
     };
 
     return (
-        <div className={cx("auth-container")}>
-            <div className={cx("auth-card")}>
+        <div className={cx('auth-container')}>
+            <div className={cx('auth-card')}>
                 <h1>{isLoginMode ? 'Login' : 'Sign Up'}</h1>
 
                 <form onSubmit={handleSubmit}>
                     {!isLoginMode && (
-                        <div className={cx("form-group")}>
+                        <div className={cx('form-group')}>
                             <label htmlFor="name">Full Name</label>
                             <input
                                 type="text"
@@ -72,7 +97,7 @@ function Auth() {
                         </div>
                     )}
 
-                    <div className={cx("form-group")}>
+                    <div className={cx('form-group')}>
                         <label htmlFor="email">Email</label>
                         <input
                             type="email"
@@ -85,7 +110,7 @@ function Auth() {
                         />
                     </div>
 
-                    <div className={cx("form-group")}>
+                    <div className={cx('form-group')}>
                         <label htmlFor="password">Password</label>
                         <input
                             type="password"
@@ -99,7 +124,7 @@ function Auth() {
                     </div>
 
                     {!isLoginMode && (
-                        <div className={cx("form-group")}>
+                        <div className={cx('form-group')}>
                             <label htmlFor="confirmPassword">
                                 Confirm Password
                             </label>
@@ -115,12 +140,12 @@ function Auth() {
                         </div>
                     )}
 
-                    <button type="submit" className={cx("submit-button")}>
+                    <button type="submit" className={cx('submit-button')}>
                         {isLoginMode ? 'Login' : 'Sign Up'}
                     </button>
                 </form>
 
-                <div className={cx("switch-mode")}>
+                <div className={cx('switch-mode')}>
                     <p>
                         {isLoginMode
                             ? "Don't have an account?"
@@ -128,7 +153,7 @@ function Auth() {
                         <button
                             type="button"
                             onClick={switchMode}
-                            className={cx("switch-button")}
+                            className={cx('switch-button')}
                         >
                             {isLoginMode ? 'Sign Up' : 'Login'}
                         </button>

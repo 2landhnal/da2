@@ -1,23 +1,51 @@
-.ul-container {
-    list-style: none; /* Remove bullet points */
-    display: flex; /* Arrange list items in a row */
-    padding: 0; /* Remove default padding */
-    margin: 0; /* Remove default margin */
+/* Header styles */
+.header {
+    border-bottom: 1px solid #e5e7eb;
 }
 
-.ul-container li {
-    margin-right: 20px; /* Add space between items */
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
 }
 
-.ul-container li:last-child {
-    margin-right: 0; /* Remove extra margin for the last item */
+.logo {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
 }
 
-.ul-container .active {
-    text-decoration: none; /* Remove underline from links */
-    color: #000; /* Adjust text color */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 24px;
 }
 
-.ul-container .active:hover {
-    color: #007bff; /* Add a hover effect (optional) */
+.nav-link {
+    text-decoration: none;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
+
+.menu-button {
+    padding: 6px 12px;
+    border: 1px solid #e5e7eb;
+    background-color: white;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.menu-button:hover {
+    background-color: #f9fafb;
 }
