@@ -1,5 +1,5 @@
 'use strict';
-import { getChannel } from './connect.js';
+import { deleteStudentByUid } from '../../models/repositories/student.repo.js';
 
 export async function setupConsumers(channel) {
     try {
@@ -13,6 +13,23 @@ export async function setupConsumers(channel) {
         channel.consume('testMQ', (msg) => {
             if (msg !== null) {
                 console.log(`[x] Received: ${msg.content.toString()}`);
+                channel.ack(msg); // Xác nhận đã xử lý thông điệp
+            }
+        });
+
+        channel.consume('student_delete', async (msg) => {
+            console.log(msg.content.toString());
+            if (msg !== null) {
+                console.log(`[x] Received delete student request`);
+                const infor = JSON.parse(msg.content.toString());
+                await deleteStudentByUid({ uid: infor.uid });
+                channel.ack(msg); // Xác nhận đã xử lý thông điệp
+            }
+        });
+
+        channel.consume('noti_send', (msg) => {
+            if (msg !== null) {
+                console.log(`[x] Received noti request, mailing...`);
                 channel.ack(msg); // Xác nhận đã xử lý thông điệp
             }
         });

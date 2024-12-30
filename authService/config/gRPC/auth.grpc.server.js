@@ -2,6 +2,8 @@ import grpc from '@grpc/grpc-js';
 import protoLoader from '@grpc/proto-loader';
 import dotenv from 'dotenv';
 import { AuthService } from '../../services/auth.service.js';
+import { generatePassword } from '../../helpers/index.js';
+import { sendToQueue } from '../messageQueue/connect.js';
 
 dotenv.config();
 
@@ -30,8 +32,10 @@ export const init = () => {
 
 const createAccount = async (call, callback) => {
     const params = JSON.parse(call.request.infor);
-    console.log(params);
-    await AuthService.register(params);
+    const password = generatePassword();
+    await AuthService.register({ ...params, password });
     console.log('Create account from grpc success!');
+    // Send noti
+    sendToQueue('noti_send', JSON.stringify({ ...params, password }));
     callback(null, params);
 };

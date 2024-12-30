@@ -23,6 +23,7 @@ import {
     queryStudent,
     deleteStudentByUid,
     getNumberOfStudentWithYoa,
+    updateStudentInfor,
 } from '../models/repositories/student.repo.js';
 import { getInfoData } from '../utils/index.js';
 import jwt from 'jsonwebtoken';
@@ -31,6 +32,7 @@ import { NUMBER_OF_SUFFIX_STUDENT_ID } from '../config/const.config.js';
 import { nameToPrefix } from '../helpers/student.helper.js';
 import Student from '../models/student.model.js';
 import { RoleCode } from '../utils/roleCode.js';
+import { createAccount } from '../config/gRPC/auth.grpc.client.js';
 
 export class StudentService {
     static register = async ({
@@ -82,32 +84,20 @@ export class StudentService {
 
         console.log('Create student done, messaging to create account');
         // GRPC:
-        const password = 'Abc123456$';
         const role = RoleCode.STUDENT;
         const infor = JSON.stringify({
             email,
-            password,
             uid,
             role,
             personalEmail,
         });
-        await authClient.createAccount({ infor }, (err, response) => {
-            if (err) {
-                console.log(err);
-                // MQ: delete student by uid
-                sendToQueue('student_delete', 'Delete student request from me');
-                // throw new BadRequestError(err);
-            } else {
-                // MQ: delete student by uid
-                sendToQueue('noti_send', 'Noti request from me');
-                console.log(`From server`, JSON.stringify(response));
-            }
-        });
+
+        await createAccount({ infor });
 
         return { newStudent };
     };
 
-    static search = async ({ page, resultPerPage, query, role }) => {
+    static search = async ({ page, resultPerPage, query, header_role }) => {
         // validate
         page = page || 1;
         resultPerPage = resultPerPage || 10;
@@ -117,7 +107,7 @@ export class StudentService {
 
         // filter
         students = students.map((student) => {
-            if (role != RoleCode.BCTSV) {
+            if (header_role != RoleCode.BCTSV) {
                 return getInfoData({
                     fileds: ['uid', 'fullname', 'yoa', 'email', 'avatar'],
                     object: student,
@@ -135,15 +125,36 @@ export class StudentService {
         };
     };
 
-    static findByUid = async ({ uid, role }) => {
+    static findByUid = async ({ uid, header_role, header_uid }) => {
         let student = await findStudentWithUid({ uid });
-        if (role != RoleCode.BCTSV) {
+        if (header_role !== RoleCode.BCTSV && uid !== header_uid) {
             student = getInfoData({
                 fileds: ['uid', 'fullname', 'yoa', 'email', 'avatar'],
                 object: student,
             });
         }
         // remove from cookie
+        return { student };
+    };
+
+    static update = async ({ uid, header_role, header_uid, ...updates }) => {
+        if (header_role !== RoleCode.BCTSV && uid !== header_uid) {
+            throw new AuthFailureError();
+        }
+        updates = getInfoData({
+            fileds: [
+                'fullname',
+                'personalEmail',
+                'yoa',
+                'phone',
+                'address',
+                'dob',
+                'gender',
+                'avatar',
+            ],
+            object: updates,
+        });
+        let student = await updateStudentInfor({ uid, ...updates });
         return { student };
     };
 }

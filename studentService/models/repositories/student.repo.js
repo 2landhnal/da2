@@ -72,7 +72,8 @@ export const queryStudent = async ({ page, resultPerPage, query }) => {
 
 export const deleteStudentByUid = async ({ uid }) => {
     try {
-        const found = await Student.findOne({ uid });
+        const found = await Student.deleteOne({ uid });
+        console.log('Student delete: ', found);
         return found;
     } catch (error) {
         console.error('Error delete Student:', error);
@@ -83,6 +84,7 @@ export const deleteStudentByUid = async ({ uid }) => {
 export const findStudentWithPersonalEmail = async ({ personalEmail }) => {
     try {
         const found = await Student.findOne({ personalEmail });
+
         return found;
     } catch (error) {
         console.error('Error finding Student:', error);
@@ -96,6 +98,20 @@ export const findStudentWithUid = async ({ uid }) => {
         return found;
     } catch (error) {
         console.error('Error finding Student:', error);
+        throw error;
+    }
+};
+
+export const updateStudentInfor = async ({ uid, ...updates }) => {
+    try {
+        const updatedStudent = await Student.findOneAndUpdate(
+            { uid },
+            { $set: updates },
+            { new: true }, // Return the updated document
+        );
+        return updatedStudent;
+    } catch (error) {
+        console.error('Error updating student:', error);
         throw error;
     }
 };

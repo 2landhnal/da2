@@ -23,15 +23,6 @@ export async function setupConsumers(channel) {
                 channel.ack(msg); // Xác nhận đã xử lý thông điệp
             }
         });
-
-        channel.consume('noti_send', (msg) => {
-            if (msg !== null) {
-                console.log(
-                    `[x] Received noti request from auth service, this must be from noti service}`,
-                );
-                channel.ack(msg); // Xác nhận đã xử lý thông điệp
-            }
-        });
     } catch (err) {
         console.error('Error setting up consumers:', err);
     }

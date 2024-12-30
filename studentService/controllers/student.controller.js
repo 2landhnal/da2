@@ -12,8 +12,10 @@ class StudentController {
     };
 
     search = async (req, res, next) => {
-        const role = req.headers[HEADER.ROLE];
-        const metadata = await StudentService.search({ ...req.body, role });
+        const metadata = await StudentService.search({
+            ...req.body,
+            header_role: req.header_role,
+        });
         new SuccessResponse({
             message: 'Search successfully!',
             metadata,
@@ -21,14 +23,25 @@ class StudentController {
     };
 
     findByUid = async (req, res, next) => {
-        const role = req.headers[HEADER.ROLE];
         const metadata = await StudentService.findByUid({
             ...req.params,
-            role,
+            header_role: req.header_role,
+            header_uid: req.header_uid,
         });
         new SuccessResponse({
             message: 'Search successfully!',
             metadata,
+        }).send(res);
+    };
+
+    update = async (req, res, next) => {
+        new CREATED({
+            message: 'Update information successfully!',
+            metadata: await StudentService.update({
+                ...req.body,
+                header_role: req.header_role,
+                header_uid: req.header_uid,
+            }),
         }).send(res);
     };
 }
