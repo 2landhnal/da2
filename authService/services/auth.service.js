@@ -169,9 +169,18 @@ export class AuthService {
     };
 
     static search = async ({ page, resultPerPage, query }) => {
-        const result = await queryAccount({ page, resultPerPage, query });
+        page = page || 1;
+        resultPerPage = resultPerPage || 10;
+        const accounts = await queryAccount({ page, resultPerPage, query });
         // remove from cookie
-        return result;
+        return {
+            accounts,
+            pagination: {
+                page,
+                resultPerPage,
+                totalResults: accounts.length,
+            },
+        };
     };
 
     static refreshAccessToken = async ({ token }) => {

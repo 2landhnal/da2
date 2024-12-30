@@ -21,12 +21,8 @@ export const createAccount = async ({ email, password, uid, role, salt }) => {
 
 export const queryAccount = async ({ page, resultPerPage, query }) => {
     try {
-        // Ensure page and resultPerPage have default values if not provided
-        const currentPage = page || 1;
-        const resultsPerPage = resultPerPage || 10;
-
         // Skip calculation for pagination
-        const skip = (currentPage - 1) * resultsPerPage;
+        const skip = (page - 1) * resultPerPage;
 
         // Parse the query string (e.g., "Accountname=abc") into a MongoDB query object
         let queryObject = {};
@@ -39,21 +35,10 @@ export const queryAccount = async ({ page, resultPerPage, query }) => {
         // Execute query with pagination
         const foundAccounts = await Account.find(queryObject)
             .skip(skip)
-            .limit(resultsPerPage);
-
-        // Get the total count for the query
-        const totalAccounts = await Account.countDocuments(queryObject);
+            .limit(resultPerPage);
 
         // Return paginated results and metadata
-        return {
-            accounts: foundAccounts,
-            pagination: {
-                currentPage,
-                resultsPerPage,
-                totalResults: totalAccounts,
-                totalPages: Math.ceil(totalAccounts / resultsPerPage),
-            },
-        };
+        return foundAccounts;
     } catch (error) {
         console.error('Error querying accounts:', error);
         throw error;
