@@ -24,6 +24,7 @@ import {
     findAccountWithEmail,
     findAccountWithUid,
     queryAccount,
+    updateInfor,
 } from '../models/repositories/account.repo.js';
 import { getInfoData } from '../utils/index.js';
 import { genSalt } from '../helpers/hash.helper.js';
@@ -220,6 +221,16 @@ export class AuthService {
             await removeRefreshToken(email, token);
             throw new AuthFailureError();
         }
+        return {};
+    };
+
+    static syncInfor = async ({ ...infor }) => {
+        infor = getInfoData({
+            fileds: ['uid', 'avatar', 'fullname'],
+            object: infor,
+        });
+        await updateInfor({ ...infor });
+        console.log('Sync infor successfull ', JSON.stringify(infor));
         return {};
     };
 }

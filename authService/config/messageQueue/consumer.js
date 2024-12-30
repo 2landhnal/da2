@@ -1,5 +1,5 @@
 'use strict';
-import { getChannel } from './connect.js';
+import { AuthService } from '../../services/auth.service.js';
 
 export async function setupConsumers(channel) {
     try {
@@ -17,9 +17,10 @@ export async function setupConsumers(channel) {
             }
         });
 
-        channel.consume('student_delete', (msg) => {
+        channel.consume('sync_student', async (msg) => {
             if (msg !== null) {
                 console.log(`[x] Received: ${msg.content.toString()}`);
+                await AuthService.syncInfor(JSON.parse(msg.content.toString()));
                 channel.ack(msg); // Xác nhận đã xử lý thông điệp
             }
         });

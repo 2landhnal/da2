@@ -86,3 +86,17 @@ export const closeAccount = async ({ uid }) => {
         throw error;
     }
 };
+
+export const updateInfor = async ({ uid, ...update }) => {
+    try {
+        const account = await Account.findOneAndUpdate(
+            { uid },
+            { $set: update },
+            { new: true }, // Return the updated document
+        );
+        return account;
+    } catch (error) {
+        console.error('Error creating account:', error);
+        throw error;
+    }
+};

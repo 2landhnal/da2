@@ -89,11 +89,15 @@ export class StudentService {
             email,
             uid,
             role,
-            personalEmail,
         });
 
-        await createAccount({ infor });
+        const creatAccountOkey = await createAccount({ infor });
+        if (!creatAccountOkey) {
+            sendToQueue('student_delete', JSON.stringify({ uid }));
+            throw new BadRequestError();
+        }
 
+        sendToQueue('sync_student', JSON.stringify(newStudent));
         return { newStudent };
     };
 
@@ -155,6 +159,7 @@ export class StudentService {
             object: updates,
         });
         let student = await updateStudentInfor({ uid, ...updates });
+        sendToQueue('sync_student', JSON.stringify(student));
         return { student };
     };
 }
