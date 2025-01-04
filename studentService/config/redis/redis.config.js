@@ -1,10 +1,10 @@
 export const studentKey = {
     key: (uid) => `student:${uid}`,
-    expireTimeInMinute: 60,
+    expireTimeInMinute: 0.5,
 };
 
 export const studentsKey = {
     key: (page, resultPerPage, query) =>
         `students:${page}:${resultPerPage}:${JSON.stringify(query)}`,
-    expireTimeInMinute: 60,
+    expireTimeInMinute: 0.5,
 };

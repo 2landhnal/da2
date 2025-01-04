@@ -33,7 +33,7 @@ import { nameToPrefix } from '../helpers/student.helper.js';
 import Student from '../models/student.model.js';
 import { RoleCode } from '../utils/roleCode.js';
 import { createAccount } from '../config/gRPC/auth.grpc.client.js';
-import { tryGetFromCache } from '../helpers/redis.helper.js';
+import { tryGetFromCache } from '../utils/redis.utils.js';
 import { studentKey, studentsKey } from '../config/redis/redis.config.js';
 
 export class StudentService {
