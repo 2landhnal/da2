@@ -9,9 +9,10 @@ const cx = classNames.bind(styles);
 function Header() {
     const menuItems = [
         { name: 'Trang chủ', href: routePath.home },
+        { name: 'Thông tin cá nhân', href: routePath.user },
         { name: 'Môn học', href: routePath.course },
         { name: 'Giảng viên', href: routePath.teacher },
-        { name: 'Đăng ký', href: routePath.enrollment },
+        { name: 'Đăng ký', href: routePath.enroll },
         { name: 'Tra cứu', href: routePath.search },
         { name: 'Tài liệu', href: routePath.document },
     ];

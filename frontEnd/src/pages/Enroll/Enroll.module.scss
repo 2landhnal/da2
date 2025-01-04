@@ -1,0 +1,130 @@
+.container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Enrollment Form */
+.enrollForm {
+    margin-bottom: 1rem;
+}
+
+.formGroup {
+    display: flex;
+    gap: 1rem;
+    background: #e0e0e0;
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+.input {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 2px;
+    font-size: 1rem;
+}
+
+.input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.enrollButton {
+    padding: 0.5rem 1rem;
+    background: white;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.enrollButton:hover {
+    background: #f5f5f5;
+}
+
+/* Error Message */
+.errorMessage {
+    color: #ff0000;
+    margin: 1rem 0;
+}
+
+/* Registered Section */
+.registeredSection {
+    margin-top: 2rem;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.sectionTitle {
+    font-size: 2rem;
+    font-weight: normal;
+}
+
+.removeButton {
+    padding: 0.5rem 1rem;
+    background: #e0e0e0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.removeButton:hover {
+    background: #d0d0d0;
+}
+
+/* Table Styles */
+.tableContainer {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+}
+
+.table th {
+    background-color: #e0e0e0;
+    font-weight: normal;
+}
+
+.table tr:nth-child(even) {
+    background-color: #f5f5f5;
+}
+
+.checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .formGroup {
+        flex-direction: column;
+    }
+
+    .table {
+        font-size: 0.9rem;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.5rem;
+    }
+}

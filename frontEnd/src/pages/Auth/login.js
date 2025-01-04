@@ -10,9 +10,8 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const cx = classNames.bind(styles);
 
-function Auth() {
+function Login() {
     const navigate = useNavigate();
-    const [isLoginMode, setIsLoginMode] = useState(true);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -49,59 +48,18 @@ function Auth() {
         }));
     };
 
-    const handleSignUp = () => {
-        if (formData.password !== formData.confirmPassword) {
-            alert("Passwords don't match!");
-            return;
-        }
-        alert('Sign Up:', {
-            name: formData.name,
-            email: formData.email,
-            password: formData.password,
-        });
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (isLoginMode) {
-            await handleLogin();
-        } else {
-            handleSignUp();
-        }
-    };
-
-    const switchMode = () => {
-        setIsLoginMode((prevMode) => !prevMode);
-        setFormData({
-            name: '',
-            email: '',
-            password: '',
-            confirmPassword: '',
-        });
+        await handleLogin();
     };
 
     return (
         <div className={cx('auth-container')}>
             <div className={cx('background')}></div>
             <div className={cx('auth-card')}>
-                <h1>{isLoginMode ? 'Login' : 'Sign Up'}</h1>
+                <h1>Login</h1>
 
                 <form onSubmit={handleSubmit}>
-                    {!isLoginMode && (
-                        <div className={cx('form-group')}>
-                            <label htmlFor="name">Full Name</label>
-                            <input
-                                type="text"
-                                id="name"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleInputChange}
-                                placeholder="Enter your full name"
-                                required={!isLoginMode}
-                            />
-                        </div>
-                    )}
-
                     <div className={cx('form-group')}>
                         <label htmlFor="email">Email</label>
                         <input
@@ -128,46 +86,14 @@ function Auth() {
                         />
                     </div>
 
-                    {!isLoginMode && (
-                        <div className={cx('form-group')}>
-                            <label htmlFor="confirmPassword">
-                                Confirm Password
-                            </label>
-                            <input
-                                type="password"
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                value={formData.confirmPassword}
-                                onChange={handleInputChange}
-                                placeholder="Confirm your password"
-                                required={!isLoginMode}
-                            />
-                        </div>
-                    )}
-
                     <button type="submit" className={cx('submit-button')}>
-                        {isLoginMode ? 'Login' : 'Sign Up'}
+                        Login
                     </button>
                 </form>
-
-                {/* <div className={cx('switch-mode')}>
-                    <p>
-                        {isLoginMode
-                            ? "Don't have an account?"
-                            : 'Already have an account?'}
-                        <button
-                            type="button"
-                            onClick={switchMode}
-                            className={cx('switch-button')}
-                        >
-                            {isLoginMode ? 'Sign Up' : 'Login'}
-                        </button>
-                    </p>
-                </div> */}
             </div>
             <ToastContainer />
         </div>
     );
 }
 
-export default Auth;
+export default Login;

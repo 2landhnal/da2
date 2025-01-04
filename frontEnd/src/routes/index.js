@@ -1,24 +1,29 @@
-import Home from '../pages/Home';
-import Login from '../pages/Login';
-import Signup from '../pages/SignUp';
 import User from '../pages/User';
+import { Login, ChangePassword } from '../pages/Auth';
+import Home from '../pages/Home';
 import Error from '../pages/Error';
-import Schedule from '../pages/Schedule';
 import { HeaderOnly } from '../layouts';
 import Registration from '../pages/Registration';
 import Semester from '../pages/Semester';
-import Landing from '../pages/Landing';
+import RegistrationSchedule from '../pages/RegistrationSchedule';
+import AddClass from '../pages/AddClass';
+import Timetable from '../pages/Timetable';
+import Enroll from '../pages/Enroll';
+import Course from '../pages/Course';
 
 const routePath = {
     login: '/login',
-    signUp: '/signUp',
+    changePassword: '/changePassword',
     user: '/user',
-    home: '/home',
+    home: '/',
     error: '/error',
     registration: '/registration',
-    schedule: '/schedule',
     semester: '/semester',
-    landing: '/',
+    course: '/course',
+    enroll: '/enroll',
+    timeTable: '/timeTable',
+    newClass: '/newClass',
+    registrationSchedule: '/registrationSchedule',
 };
 
 const publicRoutes = [
@@ -26,23 +31,21 @@ const publicRoutes = [
         path: routePath.login,
         component: Login,
         layout: HeaderOnly,
-        redirect: routePath.home,
-    },
-    {
-        path: routePath.signUp,
-        component: Signup,
-        layout: HeaderOnly,
-        redirect: routePath.home,
+        redirect: routePath.user,
     },
     { path: routePath.error, component: Error, layout: null },
-    { path: routePath.landing, component: Landing },
+    { path: routePath.home, component: Home, layout: HeaderOnly },
+    { path: routePath.course, component: Course },
 ];
 const privateRoutes = [
-    { path: routePath.user, component: User, layout: HeaderOnly },
-    { path: routePath.schedule, component: Schedule },
     { path: routePath.registration, component: Registration },
     { path: routePath.semester, component: Semester },
-    { path: routePath.home, component: Home },
+    { path: routePath.user, component: User },
+    { path: routePath.changePassword, component: ChangePassword },
+    { path: routePath.enroll, component: Enroll },
+    { path: routePath.timeTable, component: Timetable },
+    { path: routePath.newClass, component: AddClass },
+    { path: routePath.registrationSchedule, component: RegistrationSchedule },
 ];
 
 export { privateRoutes, publicRoutes, routePath };

@@ -33,6 +33,8 @@ import { nameToPrefix } from '../helpers/student.helper.js';
 import Student from '../models/student.model.js';
 import { RoleCode } from '../utils/roleCode.js';
 import { createAccount } from '../config/gRPC/auth.grpc.client.js';
+import { tryGetFromCache } from '../helpers/redis.helper.js';
+import { studentKey, studentsKey } from '../config/redis/redis.config.js';
 
 export class StudentService {
     static register = async ({
@@ -106,10 +108,16 @@ export class StudentService {
         page = Number(page) || 1;
         resultPerPage = Number(resultPerPage) || 10;
         query = JSON.parse(query);
-        console.log({ page, resultPerPage, query, header_role });
 
         // query
-        let students = await queryStudent({ page, resultPerPage, query });
+        let students;
+        students = await tryGetFromCache(
+            studentsKey.key(page, resultPerPage, query),
+            studentsKey.expireTimeInMinute,
+            async () => {
+                return await queryStudent({ page, resultPerPage, query });
+            },
+        );
 
         // filter
         students = students.map((student) => {
@@ -132,7 +140,14 @@ export class StudentService {
     };
 
     static findByUid = async ({ uid, header_role, header_uid }) => {
-        let student = await findStudentWithUid({ uid });
+        // let student = await findStudentWithUid({ uid });
+        let student = await tryGetFromCache(
+            studentKey.key(uid),
+            studentKey.expireTimeInMinute,
+            async () => {
+                return await findStudentWithUid({ uid });
+            },
+        );
         if (header_role !== RoleCode.BCTSV && uid !== header_uid) {
             student = getInfoData({
                 fileds: ['uid', 'fullname', 'yoa', 'email', 'avatar'],

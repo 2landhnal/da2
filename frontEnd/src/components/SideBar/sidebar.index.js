@@ -17,11 +17,11 @@ function Sidebar() {
         navigate(routePath.login);
     };
     const sidebarItems = [
-        { name: 'Thông báo', href: '/notifications' },
-        { name: 'Đổi mật khẩu', href: '/change-password' },
-        { name: 'Cập nhật thông tin', href: '/update-info' },
-        { name: 'Thời khóa biểu', href: '/schedule' },
-        { name: 'Kế hoạch học tập', href: '/study-plan' },
+        { name: 'Thông báo', href: routePath.home },
+        { name: 'Đổi mật khẩu', href: routePath.changePassword },
+        { name: 'Cập nhật thông tin', href: '#' },
+        { name: 'Thời khóa biểu', href: routePath.timeTable },
+        { name: 'Kế hoạch học tập', href: '#' },
         { name: 'Đăng xuất', onClick: handleLogout },
     ];
 

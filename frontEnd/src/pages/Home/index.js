@@ -1,61 +1,107 @@
-import React from 'react';
 import styles from './Home.module.scss';
 import classNames from 'classnames/bind';
 import Image from '../../components/Image';
 
 const cx = classNames.bind(styles);
 
-function App() {
+function HomePage() {
+    const planItems = [
+        {
+            month: 'Tháng 10',
+            day: '31',
+            title: '[ĐTĐH] LỊCH THI GIỮA KỲ - CUỐI KỲ HỌC KỲ 1 NĂM HỌC 2024-2025 (20241 - A- AB - B)',
+            date: '31.10.2024',
+        },
+        {
+            month: 'Tháng 12',
+            day: '09',
+            title: '[ĐTĐH] KẾ HOẠCH CẤP PHÁT CHỨNG CHỈ GIÁO DỤC QUỐC PHÒNG - K68 (ĐỢT 2)',
+            date: '9/12/2024',
+        },
+        {
+            month: 'Tháng 11',
+            day: '27',
+            title: '[ĐTĐH] THÔNG BÁO MỞ ĐĂNG KÝ TỐT NGHIỆP ĐỢT 2024.1A',
+            date: '27/11/2024',
+        },
+    ];
+
+    const newsItems = [
+        {
+            image: 'https://ctt.hust.edu.vn/Images/news-1.jpg',
+            title: '[CTSV]Thông báo về việc mua Bảo hiểm y tế (BHYT) đợt tháng 2/2025',
+            date: '3/1/2025',
+        },
+        {
+            image: 'https://ctt.hust.edu.vn/Images/news-1.jpg',
+            title: '[CTSV]Thông báo về việc trang bị dây đeo thẻ cho sinh viên K69',
+            date: '2/1/2025',
+        },
+        {
+            image: 'https://ctt.hust.edu.vn/Images/news-1.jpg',
+            title: '[ĐT]Quyết định tiếp nhận vào học CT KSCS đợt tháng 12.2024',
+            date: '30/12/2024',
+        },
+    ];
+
     return (
-        <div className={cx('dashboard')}>
-            <div className={cx('main-container')}>
-                {/* Main Content */}
-                <main className={cx('main-content')}>
-                    <div className={cx('content-header')}>
-                        <div className={cx('image-card')}>
-                            <div className={cx('placeholder-image')}>
-                                <Image
-                                    className={cx('user-avatar')}
-                                    src="https://1.bp.blogspot.com/-VqNv4Rvn--4/XGJDujZsqmI/AAAAAAAA4As/mechGLfszq4qorJe3nW5s78VHFBpgePnQCLcBGAs/s1600/t%2526j07.jpg"
-                                    alt="User Avatar"
+        <div className={cx('homepage')}>
+            {/* Hero/Banner Section */}
+            <section className={cx('hero')}></section>
+
+            {/* Main Content Section */}
+            <section className={cx('mainContent')}>
+                {/* Plan Section */}
+                <div className={cx('section')}>
+                    <h2 className={cx('sectionTitle')}>KẾ HOẠCH</h2>
+                    <div className={cx('sectionContent')}>
+                        {planItems.map((item, index) => (
+                            <div key={index} className={cx('planItem')}>
+                                <div className={cx('dateBox')}>
+                                    <div className={cx('month')}>
+                                        {item.month}
+                                    </div>
+                                    <div className={cx('day')}>{item.day}</div>
+                                </div>
+                                <div className={cx('itemContent')}>
+                                    <h3 className={cx('itemTitle')}>
+                                        {item.title}
+                                    </h3>
+                                    <div className={cx('itemDate')}>
+                                        {item.date}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* News Section */}
+                <div className={cx('section')}>
+                    <h2 className={cx('sectionTitle')}>TIN TỨC</h2>
+                    <div className={cx('sectionContent')}>
+                        {newsItems.map((item, index) => (
+                            <div key={index} className={cx('newsItem')}>
+                                <img
+                                    src={item.image}
+                                    alt=""
+                                    className={cx('newsImage')}
                                 />
+                                <div className={cx('itemContent')}>
+                                    <h3 className={cx('itemTitle')}>
+                                        {item.title}
+                                    </h3>
+                                    <div className={cx('itemDate')}>
+                                        {item.date}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div className={cx('content-text')}>
-                            <div className={cx('text-line-large')}>
-                                Họ và tên: Cao Bảo Nguyên
-                            </div>
-                            <div className={cx('text-line')}>
-                                Mã số sinh viên: 20216864
-                            </div>
-                            <div className={cx('text-line')}>
-                                Tình trạng học tập : Học
-                            </div>
-                            <div className={cx('text-line')}>
-                                Giới tính: Nam
-                            </div>
-                            <div className={cx('text-line')}>Khóa học: 66</div>
-                            <div className={cx('text-line')}>
-                                Email: nguyen.cb216864@sis.hust.edu.vn
-                            </div>
-                        </div>
+                        ))}
                     </div>
-                    <div className={cx('content-body')}>
-                        <div className={cx('text-line')}>
-                            Tổng kết học kỳ : 20232
-                        </div>
-                        <div className={cx('text-line')}>
-                            Trung bình tích lũy : 3.3
-                        </div>
-                        <div className={cx('text-line')}>
-                            Số TC tích lũy : 108
-                        </div>
-                        <div className={cx('text-line')}>Mức cảnh báo : M0</div>
-                    </div>
-                </main>
-            </div>
+                </div>
+            </section>
         </div>
     );
 }
 
-export default App;
+export default HomePage;
