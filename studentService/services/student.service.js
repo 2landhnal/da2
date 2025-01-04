@@ -103,8 +103,10 @@ export class StudentService {
 
     static search = async ({ page, resultPerPage, query, header_role }) => {
         // validate
-        page = page || 1;
-        resultPerPage = resultPerPage || 10;
+        page = Number(page) || 1;
+        resultPerPage = Number(resultPerPage) || 10;
+        query = JSON.parse(query);
+        console.log({ page, resultPerPage, query, header_role });
 
         // query
         let students = await queryStudent({ page, resultPerPage, query });

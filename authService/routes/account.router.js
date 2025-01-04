@@ -6,7 +6,7 @@ import { bdtRequired, authentication } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
-router.post('/register', asyncHandler(authController.register));
+//router.post('/register', asyncHandler(authController.register));
 
 // cookies required
 router.post('/login', asyncHandler(authController.login));

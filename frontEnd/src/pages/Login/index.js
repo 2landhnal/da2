@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { authUrl } from '../../config';
 import { routePath } from '../../routes';
 import { fetchPost } from '../../utils/fetch.utils';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const cx = classNames.bind(styles);
 
@@ -21,20 +23,22 @@ function Auth() {
     const handleLogin = async () => {
         const email = formData.email;
         const password = formData.password;
-        console.log('Login:', {
-            email,
-            password,
-        }); // fine hêre
-        let response = await fetchPost(
-            authUrl,
-            '/login',
-            JSON.stringify({ email, password }),
-            {},
-            true,
-        );
-        console.log(response);
-        localStorage.setItem('accessToken', response.metadata.accessToken);
-        navigate(routePath.home, { replace: true });
+        try {
+            let response = await fetchPost(
+                authUrl,
+                '/login',
+                JSON.stringify({ email, password }),
+                {},
+                true,
+            );
+            console.log(response);
+            localStorage.setItem('accessToken', response.metadata.accessToken);
+            toast.success('Login success', { autoClose: 3000 });
+            navigate(routePath.home, { replace: true });
+        } catch (error) {
+            toast.error('Invalid information', { autoClose: 3000 });
+            console.error(`Login failed: ${error.message}`);
+        }
     };
 
     const handleInputChange = (e) => {
@@ -78,6 +82,7 @@ function Auth() {
 
     return (
         <div className={cx('auth-container')}>
+            <div className={cx('background')}></div>
             <div className={cx('auth-card')}>
                 <h1>{isLoginMode ? 'Login' : 'Sign Up'}</h1>
 
@@ -145,7 +150,7 @@ function Auth() {
                     </button>
                 </form>
 
-                <div className={cx('switch-mode')}>
+                {/* <div className={cx('switch-mode')}>
                     <p>
                         {isLoginMode
                             ? "Don't have an account?"
@@ -158,8 +163,9 @@ function Auth() {
                             {isLoginMode ? 'Sign Up' : 'Login'}
                         </button>
                     </p>
-                </div>
+                </div> */}
             </div>
+            <ToastContainer />
         </div>
     );
 }

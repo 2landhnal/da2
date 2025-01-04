@@ -43,6 +43,8 @@ export const valueExistInHashedList = async (listKey, plain) => {
 };
 
 export const isRefreshTokenValid = async (plainToken) => {
+    const stillWell = await jwt.verify(plainToken, process.env.refreshKey);
+    if (!stillWell) return false;
     const payload = await jwt.decode(plainToken);
     const { email } = payload;
     const isValid = await valueExistInHashedList(

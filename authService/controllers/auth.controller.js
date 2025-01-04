@@ -13,6 +13,7 @@ class AuthController {
 
     login = async (req, res, next) => {
         const { accessToken, refreshToken } = await AuthService.login(req.body);
+        // console.log({ accessToken, refreshToken });
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true, // Bảo vệ cookie khỏi bị truy cập từ JavaScript
             secure: process.env.nodeEnv === 'production', // Chỉ sử dụng HTTPS trong môi trường production
@@ -59,6 +60,7 @@ class AuthController {
 
     refreshAccessToken = async (req, res, next) => {
         const { refreshToken } = req.cookies;
+        console.log(refreshToken);
         new SuccessResponse({
             message: 'Refresh access token successfully!',
             metadata: await AuthService.refreshAccessToken({

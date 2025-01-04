@@ -1,7 +1,12 @@
 @import 'normalize.css';
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
 :root {
-    --primary: #fe2c55;
+    --primary: #aa261b;
+    --secondary: #fdc722;
+    --gray: #f0f2f5;
+    --darker-gray: #9c9c9c;
+    --blue: #337ab7;
+
     --header-height: 110px;
 }
 * {
@@ -21,6 +26,13 @@ body {
 
 a {
     text-decoration: none;
+}
+
+/* Base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 .loader {

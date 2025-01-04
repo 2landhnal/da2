@@ -83,7 +83,7 @@ export class AuthService {
         const { error, value } =
             AccountValidate.accountLoginSchema.validate(userInput);
         if (error) {
-            throw new BadRequestError(error.details[0].message);
+            throw new AuthFailureError("Email or password isn't correct");
         }
 
         // check password

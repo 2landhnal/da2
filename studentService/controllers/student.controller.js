@@ -13,7 +13,7 @@ class StudentController {
 
     search = async (req, res, next) => {
         const metadata = await StudentService.search({
-            ...req.body,
+            ...req.query,
             header_role: req.header_role,
         });
         new SuccessResponse({

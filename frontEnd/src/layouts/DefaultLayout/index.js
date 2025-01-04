@@ -2,14 +2,20 @@ import styles from './DefaultLayout.module.scss';
 import classNames from 'classnames/bind';
 import PropTypes from 'prop-types';
 import Header from '../../components/Header';
+import Sidebar from '../../components/SideBar/sidebar.index';
+import Footer from '../../components/Footer';
 
 const cx = classNames.bind(styles);
 
 function DefaultLayout({ children }) {
     return (
-        <div>
+        <div className={cx('dashboard')}>
             <Header />
-            <div className={cx('wrapper')}>{children}</div>
+            <div className={cx('contentWrapper')}>
+                <Sidebar />
+                <div className={cx('mainContent')}>{children}</div>
+            </div>
+            <Footer />
         </div>
     );
 }
