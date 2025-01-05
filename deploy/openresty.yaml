@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: openresty
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: openresty
+    template:
+        metadata:
+            labels:
+                app: openresty
+        spec:
+            containers:
+                - name: openresty
+                  image: 2land/openresty:da2_v0
+                  ports:
+                      - containerPort: 80

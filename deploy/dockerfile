@@ -1,0 +1,24 @@
+FROM openresty/openresty:latest
+
+# Cài đặt các công cụ cần thiết và nâng cấp LuaRocks
+RUN apt-get update && apt-get install -y \
+    wget \
+    vim \
+    curl \
+    build-essential \
+    unzip \
+    libssl-dev && \
+    wget https://luarocks.org/releases/luarocks-3.9.2.tar.gz && \
+    tar zxpf luarocks-3.9.2.tar.gz && \
+    cd luarocks-3.9.2 && \
+    ./configure && make && make install && \
+    cd .. && rm -rf luarocks-3.9.2 luarocks-3.9.2.tar.gz
+
+# Cài đặt lua-resty-jwt
+RUN luarocks install lua-resty-jwt
+
+# Copy cấu hình nginx của bạn (nếu cần)
+COPY openresty.conf /usr/local/openresty/nginx/conf/nginx.conf
+
+EXPOSE 80
+CMD ["openresty", "-g", "daemon off;"]
