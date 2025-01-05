@@ -225,7 +225,7 @@ export class StudentService {
         }
 
         const fileExtension = file.originalname.split('.').pop();
-        const pathToSave = `avatars/${header_role}/${uid}.${fileExtension}`;
+        const pathToSave = `avatar/student/${uid}.${fileExtension}`;
         const { fileUpload, publicUrl } = await FirebaseRepo.uploadFile({
             pathToSave,
             file,
