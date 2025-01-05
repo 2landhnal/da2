@@ -1,26 +1,46 @@
-# Hướng Dẫn Sử Dụng
+# Infracstructure
 
-## 1. Lưu Ý
+![alt text](image.png)
 
-## 2. Cấu Trúc Dự Án
+# Database
 
--   **`frontEnd/`**: Chứa toàn bộ mã nguồn front-end, tất cả những gì liên quan đến front-end quăng vào đây.
--   **`aService/`, `bService/`**: Là các service riêng lẻ thuộc back-end. Khi chạy dự án cần khởi động tất cả các service này.
+![alt text](image-1.png)
 
-## 3. Hướng Dẫn Chạy Server
+# Usecase diagram
 
-1.  Chạy "cd tên_server_here"
-2.  Tạo file .env trong folder tên_server_here
-3.  Thêm các biến vào file .env. Ví dụ:
+![alt text](image-3.png)
 
-    DB_URL=url_here
+# API flow
 
-    PORT=3002
+![alt text](image-2.png)
 
-    REFRESH_TOKEN="abc"
+# env sample
 
-    SECRET_TOKEN_KEY="xyz"
+authPrefix=
+coursePrefix=
+teacherPrefix=
+studentPrefix=
 
-4.  Các file .env sẽ được cung cấp trên doc
-5.  Chạy "npm i" // tải các package cần thiết
-6.  Chạy "npm start" // chạy server
+authService=
+courseService=
+teacherService=
+studentService=
+
+authGRPC=
+courseGRPC=
+teacherGRPC=
+studentGRPC=
+
+port=
+refreshKey=
+accessKey=
+
+authDb=
+courseDb=
+teacherDb=
+studentDb=
+
+reidsUrl=redis://localhost:6379
+mqUrl=amqp://localhost
+
+nodeEnv = "dev"
