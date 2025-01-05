@@ -43,5 +43,5 @@ export const sendToQueue = (queue, message) => {
     channel.sendToQueue(queue, Buffer.from(message), {
         persistent: true,
     });
-    console.log(`[x] Sent: ${message}`);
+    console.log(`[x] Sent to queue [${queue}]: ${message}`);
 };

@@ -1,8 +1,16 @@
-const express = require('express');
+'use strict';
+import express from 'express';
+import courseRouter from './course.router.js';
+import testRouter from './test.router.js';
+import { extractInfor } from '../middlewares/infor.middleware.js';
+
 const router = express.Router();
-const accountRoute = require('./course');
-// const Book = require("../models/book");
+router.get('/healthCheck', (req, res, next) => {
+    res.status(200).send({ msg: 'Auth service' });
+});
 
-router.use('/', accountRoute);
+router.use(extractInfor);
+router.use('/v1/api', courseRouter);
+router.use('/test', testRouter);
 
-module.exports = router;
+export default router;

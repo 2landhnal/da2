@@ -2,7 +2,6 @@
 import StudentValidate from '../validate/student.validate.js';
 import bcrypt from 'bcryptjs';
 import { authClient } from '../config/gRPC/auth.grpc.client.js';
-
 import { sendToQueue } from '../config/messageQueue/connect.js';
 import {
     pushToList,
@@ -35,6 +34,8 @@ import { RoleCode } from '../utils/roleCode.js';
 import { createAccount } from '../config/gRPC/auth.grpc.client.js';
 import { tryGetFromCache } from '../utils/redis.utils.js';
 import { studentKey, studentsKey } from '../config/redis/redis.config.js';
+import { FirebaseRepo } from '../models/repositories/firebase.repo.js';
+import { TmpRepo } from '../models/repositories/tmp.repo.js';
 
 export class StudentService {
     static register = async ({
@@ -46,6 +47,7 @@ export class StudentService {
         dob,
         gender,
         avatar,
+        ...otherInfors
     }) => {
         const userInput = {
             fullname,
@@ -81,7 +83,7 @@ export class StudentService {
             address,
             dob,
             gender,
-            avatar,
+            ...otherInfors,
         });
 
         console.log('Create student done, messaging to create account');
@@ -93,7 +95,27 @@ export class StudentService {
             role,
         });
 
-        const creatAccountOkey = await createAccount({ infor });
+        let creatAccountOkey = await createAccount({ infor });
+        // upload avatar via mq
+        if (avatar) {
+            const { mimetype, originalname, size } = avatar;
+            const fileExtension = originalname.split('.').pop();
+            const nameToSave = `${uid}.${fileExtension}`;
+            const filePath = TmpRepo.saveToTemp({
+                file: avatar,
+                nameToSave,
+            });
+            const msgObject = {
+                mimetype,
+                originalname,
+                size,
+                filePath,
+                uid,
+                header_role: RoleCode.BCTSV,
+            };
+            console.log(msgObject);
+            sendToQueue('student_changeAvatar', JSON.stringify(msgObject));
+        }
         if (!creatAccountOkey) {
             sendToQueue('student_delete', JSON.stringify({ uid }));
             throw new BadRequestError();
@@ -178,5 +200,40 @@ export class StudentService {
         let student = await updateStudentInfor({ uid, ...updates });
         sendToQueue('sync_student', JSON.stringify(student));
         return { student };
+    };
+
+    static changeAvatar = async ({ file, uid, header_role, header_uid }) => {
+        // authorize
+        if (header_role !== RoleCode.BCTSV && header_uid !== uid) {
+            throw new AuthFailureError();
+        }
+        // validate file
+        const { error, value } = StudentValidate.fileSchema.validate({ file });
+        if (error) {
+            throw new BadRequestError(error.details[0].message);
+        }
+        // check user exist
+        const student = await tryGetFromCache(
+            studentKey.key(uid),
+            studentsKey.expireTimeInMinute,
+            async () => {
+                return await findStudentWithUid({ uid });
+            },
+        );
+        if (!student) {
+            throw new BadRequestError(`Student with id ${uid} not existed`);
+        }
+
+        const fileExtension = file.originalname.split('.').pop();
+        const pathToSave = `avatars/${header_role}/${uid}.${fileExtension}`;
+        const { fileUpload, publicUrl } = await FirebaseRepo.uploadFile({
+            pathToSave,
+            file,
+        });
+        sendToQueue(
+            'student_changeAvatarUrl',
+            JSON.stringify({ avatar: publicUrl, header_role, header_uid, uid }),
+        );
+        return { publicUrl };
     };
 }

@@ -33,6 +33,7 @@ export const init = () => {
 const createAccount = async (call, callback) => {
     const params = JSON.parse(call.request.infor);
     const password = generatePassword();
+    console.log({ password });
     await AuthService.register({ ...params, password });
     console.log('Create account from grpc success!');
     // Send noti

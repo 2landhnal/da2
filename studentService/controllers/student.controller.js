@@ -1,5 +1,5 @@
 'use strict';
-import { CREATED, SuccessResponse } from '../responses/success.response.js';
+import { CREATED, OK, SuccessResponse } from '../responses/success.response.js';
 import { StudentService } from '../services/student.service.js';
 import { REFRESHTOKEN_COOKIE_TIME } from '../config/const.config.js';
 import { HEADER } from '../middlewares/auth.middleware.js';
@@ -7,7 +7,10 @@ class StudentController {
     register = async (req, res, next) => {
         new CREATED({
             message: 'Registered successfully!',
-            metadata: await StudentService.register(req.body),
+            metadata: await StudentService.register({
+                avatar: req.file,
+                ...req.body,
+            }),
         }).send(res);
     };
 
@@ -41,6 +44,18 @@ class StudentController {
                 ...req.body,
                 header_role: req.header_role,
                 header_uid: req.header_uid,
+            }),
+        }).send(res);
+    };
+
+    changeAvatar = async (req, res, next) => {
+        new OK({
+            message: 'Change avatar successfully!',
+            metadata: await StudentService.changeAvatar({
+                ...req.body,
+                header_role: req.header_role,
+                header_uid: req.header_uid,
+                file: req.file,
             }),
         }).send(res);
     };
