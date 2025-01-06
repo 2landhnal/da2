@@ -1,4 +1,4 @@
 export const authUrl = 'http://localhost:3001/v1/api';
-export const docUrl = 'http://localhost:8080/documentService';
-export const signUrl = 'http://localhost:8080/signatureService';
-export const userUrl = 'http://localhost:8080/userService';
+export const studentUrl = 'http://localhost:3002/v1/api';
+export const teacherUrl = 'http://localhost:3003/v1/api';
+export const courseUrl = 'http://localhost:3004/v1/api';

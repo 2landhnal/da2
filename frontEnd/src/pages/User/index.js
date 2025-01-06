@@ -2,10 +2,38 @@ import React from 'react';
 import styles from './User.module.scss';
 import classNames from 'classnames/bind';
 import Image from '../../components/Image';
+import { useEffect, useState } from 'react';
+import { fetchGet } from '../../utils/fetch.utils';
+import { studentUrl } from '../../config';
+import { useAuth } from '../../routes/authProvider.route';
 
 const cx = classNames.bind(styles);
 
 function User() {
+    const { payload, setPayload } = useAuth();
+    const [student, setStudent] = useState({});
+    useEffect(() => {
+        const getInfor = async () => {
+            const options = {
+                headers: {
+                    'x-user-id': payload.uid,
+                    'x-user-role': payload.role,
+                },
+            };
+
+            const response = await fetchGet(
+                studentUrl,
+                `${payload.uid}`,
+                options,
+                false,
+            );
+            console.log(response);
+            if (response.metadata && response.metadata.student)
+                setStudent(response.metadata.student);
+            console.log(payload.avatar);
+        };
+        getInfor();
+    }, []);
     return (
         <div className={cx('dashboard')}>
             <div className={cx('main-container')}>
@@ -13,20 +41,21 @@ function User() {
                 <main className={cx('main-content')}>
                     <div className={cx('content-header')}>
                         <div className={cx('image-card')}>
-                            <div className={cx('placeholder-image')}>
-                                <Image
-                                    className={cx('user-avatar')}
-                                    src="https://1.bp.blogspot.com/-VqNv4Rvn--4/XGJDujZsqmI/AAAAAAAA4As/mechGLfszq4qorJe3nW5s78VHFBpgePnQCLcBGAs/s1600/t%2526j07.jpg"
-                                    alt="User Avatar"
-                                />
-                            </div>
+                            <Image
+                                className={cx(
+                                    'user-avatar',
+                                    'placeholder-image',
+                                )}
+                                src={student.avatar}
+                                alt="User Avatar"
+                            />
                         </div>
                         <div className={cx('content-text')}>
                             <div className={cx('text-line-large')}>
-                                Họ và tên: Cao Bảo Nguyên
+                                Họ và tên: {student.fullname}
                             </div>
                             <div className={cx('text-line')}>
-                                Mã số sinh viên: 20216864
+                                Mã số sinh viên: {student.uid}
                             </div>
                             <div className={cx('text-line')}>
                                 Tình trạng học tập : Học
@@ -34,9 +63,11 @@ function User() {
                             <div className={cx('text-line')}>
                                 Giới tính: Nam
                             </div>
-                            <div className={cx('text-line')}>Khóa học: 66</div>
                             <div className={cx('text-line')}>
-                                Email: nguyen.cb216864@sis.hust.edu.vn
+                                Khóa học: {student.yoa - 2021 + 66}
+                            </div>
+                            <div className={cx('text-line')}>
+                                Email: {student.email}
                             </div>
                         </div>
                     </div>

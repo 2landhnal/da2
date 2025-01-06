@@ -11,8 +11,8 @@ import { AuthProvider } from './routes/authProvider.route';
 
 function App() {
     return (
-        <AuthProvider>
-            <Router>
+        <Router>
+            <AuthProvider>
                 <div className="App">
                     <Routes>
                         {publicRoutes.map((route, index) => {
@@ -59,8 +59,8 @@ function App() {
                         })}
                     </Routes>
                 </div>
-            </Router>
-        </AuthProvider>
+            </AuthProvider>
+        </Router>
     );
 }
 

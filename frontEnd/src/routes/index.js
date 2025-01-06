@@ -11,7 +11,7 @@ import Timetable from '../pages/Timetable';
 import Enroll from '../pages/Enroll';
 import Course from '../pages/Course';
 
-const routePath = {
+export const routePath = {
     login: '/login',
     changePassword: '/changePassword',
     user: '/user',
@@ -26,7 +26,7 @@ const routePath = {
     registrationSchedule: '/registrationSchedule',
 };
 
-const publicRoutes = [
+export const publicRoutes = [
     {
         path: routePath.login,
         component: Login,
@@ -37,7 +37,7 @@ const publicRoutes = [
     { path: routePath.home, component: Home, layout: HeaderOnly },
     { path: routePath.course, component: Course },
 ];
-const privateRoutes = [
+export const privateRoutes = [
     { path: routePath.registration, component: Registration },
     { path: routePath.semester, component: Semester },
     { path: routePath.user, component: User },
@@ -47,5 +47,3 @@ const privateRoutes = [
     { path: routePath.newClass, component: AddClass },
     { path: routePath.registrationSchedule, component: RegistrationSchedule },
 ];
-
-export { privateRoutes, publicRoutes, routePath };

@@ -23,7 +23,7 @@ export const genSalt = async () => {
 export const createAccessToken = async (payload) => {
     try {
         const orgPayload = getInfoData({
-            fileds: ['uid', 'email', 'role', 'fullname'],
+            fileds: ['uid', 'email', 'role', 'fullname', 'avatar'],
             object: payload,
         });
         const accessToken = await jwt.sign(orgPayload, process.env.accessKey, {

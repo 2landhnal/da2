@@ -13,8 +13,5 @@ RUN npm install
 # Sao chép toàn bộ mã nguồn của ứng dụng vào container
 COPY . .
 
-# Mở port nếu dịch vụ cần
-EXPOSE 3001
-
 # Khởi động ứng dụng
 CMD ["npm", "start"]

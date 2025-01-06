@@ -1,10 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './Timetable.module.scss';
 import classNames from 'classnames/bind';
+import Tippy from '@tippyjs/react/headless';
+import 'tippy.js/dist/tippy.css'; // optional
+import SemesterBox from '../../components/SemesterBox';
 
 const cx = classNames.bind(styles);
 
 function TimeTable() {
+    let semesterLst = [
+        {
+            title: 20221,
+        },
+        {
+            title: 20222,
+        },
+        {
+            title: 20223,
+        },
+    ];
+    semesterLst = semesterLst.map((e, index) => {
+        return {
+            ...e,
+            onClick: () => {
+                setSemester(semesterLst[index]);
+            },
+        };
+    });
+    const [semester, setSemester] = useState(semesterLst[0]);
     // Sample data - this could be fetched from an API
     const scheduleData = [
         {
@@ -34,7 +57,7 @@ function TimeTable() {
         <div className={cx('container')}>
             <div className={cx('headerSection')}>
                 <h1 className={cx('title')}>Time table</h1>
-                <span className={cx('semester')}>20231</span>
+                <SemesterBox semesterLst={semesterLst} semester={semester} />
             </div>
 
             <div className={cx('tableContainer')}>
