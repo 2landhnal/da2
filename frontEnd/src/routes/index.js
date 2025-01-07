@@ -10,6 +10,7 @@ import AddClass from '../pages/AddClass';
 import Timetable from '../pages/Timetable';
 import Enroll from '../pages/Enroll';
 import Course from '../pages/Course';
+import { RoleCode } from '../config/roleCode';
 
 export const routePath = {
     login: '/login',
@@ -40,7 +41,11 @@ export const publicRoutes = [
 export const privateRoutes = [
     { path: routePath.registration, component: Registration },
     { path: routePath.semester, component: Semester },
-    { path: routePath.user, component: User },
+    {
+        path: routePath.user,
+        component: User,
+        allowRoles: [RoleCode.STUDENT, RoleCode.TEACHER],
+    },
     { path: routePath.changePassword, component: ChangePassword },
     { path: routePath.enroll, component: Enroll },
     { path: routePath.timeTable, component: Timetable },

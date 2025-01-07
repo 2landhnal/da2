@@ -119,7 +119,7 @@ export class AuthService {
         };
     };
 
-    static changePassword = async ({ newPassword, uid }) => {
+    static changePassword = async ({ currentPassword, newPassword, uid }) => {
         const userInput = { uid, password: newPassword };
 
         // validate
@@ -129,13 +129,20 @@ export class AuthService {
             throw new BadRequestError(error.details[0].message);
         }
 
-        // check password
+        // get account
         const account = await findAccountWithUid({ uid });
         const salt = account.salt;
-        const hashedPassword = await bcrypt.hash(newPassword, salt);
-        const same = hashedPassword === account.password;
-        if (same) {
-            throw new AuthFailureError(
+
+        // check password
+        const hashedPassword = await bcrypt.hash(currentPassword, salt);
+        if (hashedPassword !== account.password) {
+            throw new AuthFailureError('Current password not match');
+        }
+
+        // check new password
+        const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+        if (hashedNewPassword === account.password) {
+            throw new BadRequestError(
                 'New password must be different from current password',
             );
         }

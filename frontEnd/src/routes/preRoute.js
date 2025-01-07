@@ -6,7 +6,7 @@ import { useAuth } from './authProvider.route';
 
 function PreRoute(route) {
     const navigate = useNavigate();
-    const { auth, setAuth } = useAuth();
+    const { auth, setAuth, payload } = useAuth();
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -22,8 +22,15 @@ function PreRoute(route) {
                 navigate(route.redirect, { replace: true });
             }
             // Nếu route là private
-            if (!isPublicRoute && !isAuthenticated) {
-                navigate(routePath.login, { replace: true });
+            if (!isPublicRoute) {
+                if (!isAuthenticated)
+                    navigate(routePath.login, { replace: true });
+                else if (
+                    route.allowRoles &&
+                    !route.allowRoles.includes(payload.role)
+                ) {
+                    navigate(routePath.home, { replace: true });
+                }
             }
         };
 

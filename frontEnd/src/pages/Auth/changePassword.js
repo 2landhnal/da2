@@ -4,7 +4,11 @@ import classNames from 'classnames/bind';
 import { useNavigate } from 'react-router-dom';
 import { authUrl } from '../../config';
 import { routePath } from '../../routes';
-import { fetchPost } from '../../utils/fetch.utils';
+import {
+    fetchPost,
+    fetchPut,
+    optionWithAccessToken,
+} from '../../utils/fetch.utils';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -19,23 +23,32 @@ function ChangePassword() {
     });
 
     const handleChangePassword = async () => {
-        const email = formData.email;
-        const password = formData.password;
+        const { currentPassword, newPassword } = formData;
         try {
-            let response = await fetchPost(
+            const options = optionWithAccessToken({
+                otherHeaders: {
+                    'x-user-id': 20250000,
+                },
+            });
+            let response = await fetchPut(
                 authUrl,
-                '/login',
-                JSON.stringify({ email, password }),
-                {},
+                '/changePassword',
+                JSON.stringify({ currentPassword, newPassword }),
+                options,
                 true,
             );
             console.log(response);
-            localStorage.setItem('accessToken', response.metadata.accessToken);
-            toast.success('Login success', { autoClose: 3000 });
-            navigate(routePath.home, { replace: true });
+            toast.success('Change password success', { autoClose: 3000 });
+            setFormData({
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: '',
+            });
         } catch (error) {
-            toast.error('Invalid information', { autoClose: 3000 });
-            console.error(`Login failed: ${error.message}`);
+            toast.error(error.message || 'Invalid information', {
+                autoClose: 3000,
+            });
+            console.error(`Change password failed: ${error.message}`);
         }
     };
 
@@ -49,6 +62,12 @@ function ChangePassword() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (formData.confirmPassword !== formData.newPassword) {
+            toast.error('New password and confirm password not match', {
+                autoClose: 3000,
+            });
+            return;
+        }
         await handleChangePassword();
     };
 
@@ -78,8 +97,8 @@ function ChangePassword() {
                         <label htmlFor="password">Password</label>
                         <input
                             type="password"
-                            id="password"
-                            name="password"
+                            id="newPassword"
+                            name="newPassword"
                             value={formData.newPassword}
                             onChange={handleInputChange}
                             placeholder="Enter new password"

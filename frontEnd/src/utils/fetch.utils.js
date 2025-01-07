@@ -1,26 +1,26 @@
 import { joinUrl } from './helper';
 
 export const fetchAPI = async (url, options = {}) => {
-    try {
-        const response = await fetch(url, options);
+    let response = await fetch(url, options);
 
-        // Kiểm tra nếu response không thành công (status code >= 400)
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        // Nếu response có JSON, tự động parse
-        const contentType = response.headers.get('Content-Type');
-        if (contentType && contentType.includes('application/json')) {
-            return await response.json();
-        }
-
-        // Trả về response text nếu không phải JSON
-        return await response.text();
-    } catch (error) {
-        console.error(`Error in fetchAPI: ${error}`);
-        throw error; // Propagate error để xử lý tiếp ở cấp cao hơn
+    // Kiểm tra nếu response không thành công (status code >= 400)
+    if (!response.ok) {
+        response = await response.json();
+        const error = new Error(
+            response.message || `HTTP error! Status: ${response.status}`,
+        );
+        error.status = response.status; // Thêm status vào error
+        throw error;
     }
+
+    // Nếu response có JSON, tự động parse
+    const contentType = response.headers.get('Content-Type');
+    if (contentType && contentType.includes('application/json')) {
+        return await response.json();
+    }
+
+    // Trả về response text nếu không phải JSON
+    return await response.text();
 };
 
 export const fetchGet = async (base, path, options = {}, cookies = false) => {
@@ -36,7 +36,7 @@ export const fetchGet = async (base, path, options = {}, cookies = false) => {
         });
         return response;
     } catch (error) {
-        console.error(`GET request failed: ${error}`);
+        console.log(error);
         throw error;
     }
 };
@@ -111,10 +111,15 @@ export const fetchDelete = async (
     }
 };
 
-export const optionWithAccessToken = () => {
+export const optionWithAccessToken = ({
+    otherHeaders = {},
+    otherOptions = {},
+}) => {
     return {
+        ...otherOptions,
         headers: {
             authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            ...otherHeaders,
         },
     };
 };

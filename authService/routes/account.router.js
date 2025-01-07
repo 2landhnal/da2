@@ -17,7 +17,7 @@ router.get(
 );
 
 // auth
-router.post('/changePassword', asyncHandler(authController.changePassword));
+router.put('/changePassword', asyncHandler(authController.changePassword));
 // bdt required
 // router.use(bdtRequired);
 // router.get('/search', asyncHandler(authController.search));
