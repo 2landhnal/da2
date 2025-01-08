@@ -6,19 +6,6 @@ import { StudentService } from '../../services/student.service.js';
 
 export async function setupConsumers(channel) {
     try {
-        const consumeQueues = [
-            'testMQ',
-            'student_delete',
-            'noti_send',
-            'student_changeAvatarUrl',
-            'student_changeAvatar',
-        ];
-
-        for (const queue of consumeQueues) {
-            await channel.assertQueue(queue, { durable: true });
-            console.log(`Listening queue [${queue}]`);
-        }
-
         channel.consume('testMQ', (msg) => {
             if (msg !== null) {
                 console.log(`[x] Received: ${msg.content.toString()}`);

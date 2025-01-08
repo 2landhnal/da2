@@ -5,4 +5,4 @@ db.on('error', (err) => console.error(err));
 db.once('open', () => console.log('Mongoose connected'));
 
 export const connectMongoose = async () =>
-    await mongoose.connect(process.env.courseDb);
+    await mongoose.connect(process.env.semesterDb);

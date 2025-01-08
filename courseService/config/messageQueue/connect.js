@@ -1,9 +1,9 @@
 'use strict';
 import amqp from 'amqplib';
 import { setupConsumers } from './consumer.js';
-import { setupProducers } from './producer.js';
 
 let channel;
+const listeningQueues = ['testMQ'];
 
 export async function connectRabbitMQ() {
     try {
@@ -16,7 +16,11 @@ export async function connectRabbitMQ() {
         console.log(
             `RabbitMQ connected and channel created. Allow max ${maxPrefetch} messages processing at a time`,
         );
-        await setupProducers(channel);
+
+        for (const queue of listeningQueues) {
+            await channel.assertQueue(queue, { durable: true });
+            console.log(`Listening queue [${queue}]`);
+        }
         await setupConsumers(channel);
 
         sendToQueue('testMQ', 'Hello world from MQ producer!');

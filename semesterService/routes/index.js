@@ -1,6 +1,7 @@
 'use strict';
 import express from 'express';
-import courseRouter from './course.router.js';
+import semesterRouter from './semetser.router.js';
+import scheduleRouter from './schedule.router.js';
 import testRouter from './test.router.js';
 import { extractInfor } from '../middlewares/infor.middleware.js';
 
@@ -10,7 +11,8 @@ router.get('/healthCheck', (req, res, next) => {
 });
 
 router.use(extractInfor);
-router.use('/v1/api', courseRouter);
+router.use('/v1/api/schedule', scheduleRouter);
+router.use('/v1/api', semesterRouter);
 router.use('/test', testRouter);
 
 export default router;

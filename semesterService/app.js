@@ -12,6 +12,7 @@ import { redisClient } from './config/redis/index.js';
 import compression from 'compression';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
+import { TimeCheckerController } from './controllers/timeChecker.controller.js';
 
 const app = express();
 
@@ -70,5 +71,6 @@ const startApp = async () => {
 };
 
 startApp();
+TimeCheckerController.Check();
 
 export default app;
