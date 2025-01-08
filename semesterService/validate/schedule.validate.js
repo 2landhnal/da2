@@ -8,8 +8,12 @@ class ScheduleValidate {
         endDate: Joi.date().required(),
     }).unknown(true);
     static timeSlotSchema = Joi.object({
-        startAt: Joi.string().required(),
-        endAt: Joi.string().required(),
+        startAt: Joi.string()
+            .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/, 'HH:mm format')
+            .required(),
+        endAt: Joi.string()
+            .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/, 'HH:mm format')
+            .required(),
         allowance: Joi.array().items(Joi.string()),
     }).unknown(true);
 }

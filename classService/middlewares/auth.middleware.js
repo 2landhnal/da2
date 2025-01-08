@@ -30,6 +30,14 @@ export const bdtRequired = asyncHandler(async (req, res, next) => {
     return next();
 });
 
+export const bcsvcRequired = asyncHandler(async (req, res, next) => {
+    const role = req.headers[HEADER.ROLE];
+    if (role != RoleCode.BCSVC) {
+        throw new AuthFailureError();
+    }
+    return next();
+});
+
 export const authRequired = asyncHandler(async (req, res, next) => {
     if (req.header_role && req.header_uid) {
         return next();

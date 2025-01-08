@@ -1,10 +1,10 @@
 'use strict';
 import express from 'express';
-import semesterRouter from './semetser.router.js';
-import scheduleRouter from './schedule.router.js';
+import shiftRouter from './shift.router.js';
+import roomRouter from './room.router.js';
+import classRouter from './class.router.js';
 import testRouter from './test.router.js';
 import { extractInfor } from '../middlewares/infor.middleware.js';
-import { authRequired } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 router.get('/healthCheck', (req, res, next) => {
@@ -12,9 +12,9 @@ router.get('/healthCheck', (req, res, next) => {
 });
 
 router.use(extractInfor);
-router.use(authRequired);
-router.use('/v1/api/schedule', scheduleRouter);
-router.use('/v1/api', semesterRouter);
+// router.use('/v1/api', classRouter);
+router.use('/v1/api/room', roomRouter);
+router.use('/v1/api/shift', shiftRouter);
 router.use('/test', testRouter);
 
 export default router;

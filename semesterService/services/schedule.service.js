@@ -204,9 +204,11 @@ export class ScheduleService {
 
         // timeslot validate
         timeSlots.forEach((timeSlot) => {
-            const { e, v } = ScheduleValidate.timeSlotSchema.validate(timeSlot);
-            if (e) {
-                throw new BadRequestError(e.details[0].message);
+            console.log(timeSlot);
+            const { error, value } =
+                ScheduleValidate.timeSlotSchema.validate(timeSlot);
+            if (error) {
+                throw new BadRequestError(error.details[0].message);
             }
         });
 

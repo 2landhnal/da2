@@ -1,7 +1,5 @@
 'use strict';
 import StudentValidate from '../validate/student.validate.js';
-import bcrypt from 'bcryptjs';
-import { authClient } from '../config/gRPC/auth.grpc.client.js';
 import { sendToQueue } from '../config/messageQueue/connect.js';
 import {
     pushToList,
@@ -31,7 +29,7 @@ import { NUMBER_OF_SUFFIX_STUDENT_ID } from '../config/const.config.js';
 import { nameToPrefix } from '../helpers/student.helper.js';
 import Student from '../models/student.model.js';
 import { RoleCode } from '../utils/roleCode.js';
-import { createAccount } from '../config/gRPC/auth.grpc.client.js';
+import { gRPCAuthClient } from '../config/gRPC/auth.grpc.client.js';
 import { tryGetFromCache } from '../utils/redis.utils.js';
 import { studentKey, studentsKey } from '../config/redis/redis.config.js';
 import { FirebaseRepo } from '../models/repositories/firebase.repo.js';
@@ -60,6 +58,15 @@ export class StudentService {
             StudentValidate.studentRegisterSchema.validate(userInput);
         if (error) {
             throw new BadRequestError(error.details[0].message);
+        }
+
+        if (avatar) {
+            const { error, value } = StudentValidate.fileSchema.validate({
+                file: avatar,
+            });
+            if (error) {
+                throw new BadRequestError(error.details[0].message);
+            }
         }
 
         const numberOfStudentWithYoa = await getNumberOfStudentWithYoa({ yoa });
@@ -95,7 +102,8 @@ export class StudentService {
             role,
         });
 
-        let creatAccountOkey = await createAccount({ infor });
+        let creatAccountOkey = (await gRPCAuthClient.createAccount({ infor }))
+            .ok;
         // upload avatar via mq
         if (avatar) {
             const { mimetype, originalname, size } = avatar;
@@ -197,7 +205,11 @@ export class StudentService {
             ],
             object: updates,
         });
-        let student = await updateStudentInfor({ uid, ...updates });
+        let student = await findStudentWithUid({ uid });
+        if (!student) {
+            throw new BadRequestError('Student not exist');
+        }
+        student = await updateStudentInfor({ uid, ...updates });
         sendToQueue('sync_student', JSON.stringify(student));
         return { student };
     };

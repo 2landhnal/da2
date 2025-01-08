@@ -1,0 +1,15 @@
+syntax = 'proto3';
+
+package coursePakage;
+
+service CourseService {
+    rpc checkCourseOpen (Course) returns (BooleanResponse);
+}
+
+message Course {
+    string infor = 1;
+}
+
+message BooleanResponse {
+    bool ans = 1; // Field to indicate if the course is open
+}

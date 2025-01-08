@@ -3,7 +3,7 @@ import express from 'express';
 import { SemesterController } from '../controllers/semester.controller.js';
 import { ScheduleController } from '../controllers/schedule.controller.js';
 import { asyncHandler } from '../helpers/asyncHandler.js';
-import { bdtRequired } from '../middlewares/auth.middleware.js';
+import { bdtRequired, authRequired } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
@@ -14,8 +14,8 @@ router.get(
 );
 router.get('/:id', asyncHandler(SemesterController.findById));
 
-router.use(bdtRequired);
-router.post('/', asyncHandler(SemesterController.create));
-router.put('/', asyncHandler(SemesterController.update));
+// bdt required
+router.post('/', bdtRequired, asyncHandler(SemesterController.create));
+router.put('/', bdtRequired, asyncHandler(SemesterController.update));
 
 export default router;
