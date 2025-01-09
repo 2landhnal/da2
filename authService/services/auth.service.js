@@ -30,6 +30,8 @@ import { getInfoData } from '../utils/index.js';
 import { genSalt } from '../helpers/hash.helper.js';
 import jwt from 'jsonwebtoken';
 import { AccountStatus } from '../utils/accountStatus.js';
+import { sendToQueue } from '../config/messageQueue/connect.js';
+import { RoleCode } from '../utils/roleCode.js';
 
 export class AuthService {
     static register = async ({ email, password, uid, role, personalEmail }) => {
@@ -57,13 +59,16 @@ export class AuthService {
         // Check username existed
         let hoddedUser = await findAccountWithEmail({ email });
         if (hoddedUser) {
+            console.log(hoddedUser);
             throw new BadRequestError('Error: User already registered');
         }
 
         // Check uid existed
         hoddedUser = await findAccountWithUid({ uid });
-        if (hoddedUser) {
-            throw new BadRequestError('Error: User already registered');
+        if (hoddedUser && hoddedUser.role === role) {
+            throw new BadRequestError(
+                `Error: ${role} with uid ${uid} already registered`,
+            );
         }
 
         const salt = await genSalt();
@@ -191,6 +196,32 @@ export class AuthService {
         };
     };
 
+    static syncStatus = async () => {
+        const page = 1;
+        const resultPerPage = 1000;
+        const accounts = await queryAccount({ page, resultPerPage, query: {} });
+        accounts.forEach((account) => {
+            if (account.role === RoleCode.STUDENT) {
+                sendToQueue(
+                    'student_syncStatus',
+                    JSON.stringify({
+                        uid: account.uid,
+                        accountStatus: account.accountStatus,
+                    }),
+                );
+            } else if (account.role === RoleCode.TEACHER) {
+                sendToQueue(
+                    'teacher_syncStatus',
+                    JSON.stringify({
+                        uid: account.uid,
+                        accountStatus: account.accountStatus,
+                    }),
+                );
+            }
+        });
+        return {};
+    };
+
     static refreshAccessToken = async ({ token }) => {
         const payload = await jwt.decode(token);
         const { email } = payload;
@@ -233,7 +264,7 @@ export class AuthService {
 
     static syncInfor = async ({ ...infor }) => {
         infor = getInfoData({
-            fileds: ['uid', 'avatar', 'fullname'],
+            fileds: ['uid', 'avatar', 'fullname', 'role'],
             object: infor,
         });
         await updateInfor({ ...infor });

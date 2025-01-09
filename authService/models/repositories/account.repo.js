@@ -87,10 +87,10 @@ export const closeAccount = async ({ uid }) => {
     }
 };
 
-export const updateInfor = async ({ uid, ...update }) => {
+export const updateInfor = async ({ uid, role, ...update }) => {
     try {
         const account = await Account.findOneAndUpdate(
-            { uid },
+            { uid, role },
             { $set: update },
             { new: true }, // Return the updated document
         );

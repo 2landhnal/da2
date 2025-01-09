@@ -1,6 +1,9 @@
 'use strict';
 import { requestHandler } from '../../helpers/requestHandler.js';
-import { deleteStudentByUid } from '../../models/repositories/student.repo.js';
+import {
+    deleteStudentByUid,
+    updateStudentStatus,
+} from '../../models/repositories/student.repo.js';
 import { TmpRepo } from '../../models/repositories/tmp.repo.js';
 import { StudentService } from '../../services/student.service.js';
 
@@ -9,6 +12,23 @@ export async function setupConsumers(channel) {
         channel.consume('testMQ', (msg) => {
             if (msg !== null) {
                 console.log(`[x] Received: ${msg.content.toString()}`);
+                channel.ack(msg); // Xác nhận đã xử lý thông điệp
+            }
+        });
+
+        channel.consume('student_syncStatus', async (msg) => {
+            if (msg !== null) {
+                const content = msg.content.toString();
+                console.log(`[x] Received sync status request ${content}`);
+                const infor = JSON.parse(content);
+                const [error, value] = await await requestHandler(
+                    // infor: {uid, accountStatus}
+                    updateStudentStatus(infor),
+                );
+                if (error) {
+                    console.log(error);
+                    return;
+                }
                 channel.ack(msg); // Xác nhận đã xử lý thông điệp
             }
         });
@@ -52,7 +72,7 @@ export async function setupConsumers(channel) {
                 await TmpRepo.deleteFileAsync(msgObject);
             };
             if (msg !== null) {
-                console.log(`[x] Received chnage avatar request`);
+                console.log(`[x] Received change avatar request`);
                 const msgObject = JSON.parse(msg.content.toString());
                 const [error, value] = await await requestHandler(
                     uploadAvatar(msgObject),

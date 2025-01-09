@@ -115,3 +115,17 @@ export const updateStudentInfor = async ({ uid, ...updates }) => {
         throw error;
     }
 };
+
+export const updateStudentStatus = async ({ uid, accountStatus }) => {
+    try {
+        const updatedStudent = await Student.findOneAndUpdate(
+            { uid },
+            { $set: { accountStatus } },
+            { new: true }, // Return the updated document
+        );
+        return updatedStudent;
+    } catch (error) {
+        console.error('Error updating student accountStatus:', error);
+        throw error;
+    }
+};

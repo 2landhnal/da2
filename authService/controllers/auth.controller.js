@@ -68,6 +68,15 @@ class AuthController {
             }),
         }).send(res);
     };
+
+    syncStatus = async (req, res, next) => {
+        const { refreshToken } = req.cookies;
+        console.log(refreshToken);
+        new SuccessResponse({
+            message: 'Sync requests sent!',
+            metadata: await AuthService.syncStatus(),
+        }).send(res);
+    };
 }
 
 export const authController = new AuthController();

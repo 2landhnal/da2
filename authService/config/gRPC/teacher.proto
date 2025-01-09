@@ -1,0 +1,15 @@
+syntax = 'proto3';
+
+package teacherPakage;
+
+service TeacherService {
+    rpc isTeacherExist (Teacher) returns (Response);
+}
+
+message Teacher {
+    string infor = 1;
+}
+
+message Response {
+    string response = 1;
+}

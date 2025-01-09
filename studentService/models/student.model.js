@@ -1,8 +1,6 @@
 'use strict';
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
 import { AccountStatus } from '../utils/accountStatus.js';
-import { RoleCode } from '../utils/roleCode.js';
 
 const DOCUMENT_NAME = 'Student';
 const COLLECTION_NAME = 'Students';
@@ -28,6 +26,10 @@ const StudentSchema = new mongoose.Schema(
             enum: Object.values(GENDER),
         },
         avatar: { type: String, default: '' },
+        accountStatus: {
+            type: String,
+            enum: Object.values(AccountStatus),
+        },
     },
     {
         collection: COLLECTION_NAME,

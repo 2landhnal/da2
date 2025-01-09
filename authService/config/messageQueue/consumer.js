@@ -2,7 +2,7 @@
 import { requestHandler } from '../../helpers/requestHandler.js';
 import { AuthService } from '../../services/auth.service.js';
 
-export async function setupConsumers(channel) {
+export const setupConsumers = (channel) => {
     try {
         channel.consume('testMQ', (msg) => {
             if (msg !== null) {
@@ -18,7 +18,7 @@ export async function setupConsumers(channel) {
             }
         });
 
-        channel.consume('sync_student', async (msg) => {
+        channel.consume('sync_infor', async (msg) => {
             if (msg !== null) {
                 const msgObject = JSON.parse(msg.content.toString());
                 if (msgObject === null) {
@@ -40,4 +40,4 @@ export async function setupConsumers(channel) {
     } catch (err) {
         console.error('Error setting up consumers:', err);
     }
-}
+};

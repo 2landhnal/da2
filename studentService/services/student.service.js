@@ -34,6 +34,7 @@ import { tryGetFromCache } from '../utils/redis.utils.js';
 import { studentKey, studentsKey } from '../config/redis/redis.config.js';
 import { FirebaseRepo } from '../models/repositories/firebase.repo.js';
 import { TmpRepo } from '../models/repositories/tmp.repo.js';
+import { MqService } from './mq.service.js';
 
 export class StudentService {
     static register = async ({
@@ -104,29 +105,13 @@ export class StudentService {
 
         let creatAccountOkey = (await gRPCAuthClient.createAccount({ infor }))
             .ok;
-        // upload avatar via mq
-        if (avatar) {
-            const { mimetype, originalname, size } = avatar;
-            const fileExtension = originalname.split('.').pop();
-            const nameToSave = `${uid}.${fileExtension}`;
-            const filePath = TmpRepo.saveToTemp({
-                file: avatar,
-                nameToSave,
-            });
-            const msgObject = {
-                mimetype,
-                originalname,
-                size,
-                filePath,
-                uid,
-                header_role: RoleCode.BCTSV,
-            };
-            console.log(msgObject);
-            sendToQueue('student_changeAvatar', JSON.stringify(msgObject));
-        }
         if (!creatAccountOkey) {
             sendToQueue('student_delete', JSON.stringify({ uid }));
             throw new BadRequestError();
+        }
+        // upload avatar via mq
+        if (avatar) {
+            MqService.uploadAvatar({ avatar, uid });
         }
 
         sendToQueue('sync_student', JSON.stringify(newStudent));
@@ -178,7 +163,10 @@ export class StudentService {
                 return await findStudentWithUid({ uid });
             },
         );
-        if (header_role !== RoleCode.BCTSV && uid !== header_uid) {
+        const auth =
+            header_role === RoleCode.BCTSV ||
+            (header_role === RoleCode.STUDENT && header_uid === uid);
+        if (!auth) {
             student = getInfoData({
                 fileds: ['uid', 'fullname', 'yoa', 'email', 'avatar'],
                 object: student,
@@ -189,7 +177,10 @@ export class StudentService {
     };
 
     static update = async ({ uid, header_role, header_uid, ...updates }) => {
-        if (header_role !== RoleCode.BCTSV && uid !== header_uid) {
+        const auth =
+            header_role === RoleCode.BCTSV ||
+            (header_role === RoleCode.STUDENT && header_uid === uid);
+        if (!auth) {
             throw new AuthFailureError();
         }
         updates = getInfoData({
@@ -209,14 +200,21 @@ export class StudentService {
         if (!student) {
             throw new BadRequestError('Student not exist');
         }
-        student = await updateStudentInfor({ uid, ...updates });
-        sendToQueue('sync_student', JSON.stringify(student));
+        student = await updateStudentInfor({
+            uid,
+            role: RoleCode.STUDENT,
+            ...updates,
+        });
+        sendToQueue('sync_infor', JSON.stringify(student));
         return { student };
     };
 
     static changeAvatar = async ({ file, uid, header_role, header_uid }) => {
         // authorize
-        if (header_role !== RoleCode.BCTSV && header_uid !== uid) {
+        const auth =
+            header_role === RoleCode.BCTSV ||
+            (header_role === RoleCode.STUDENT && header_uid === uid);
+        if (!auth) {
             throw new AuthFailureError();
         }
         // validate file

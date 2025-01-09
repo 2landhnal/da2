@@ -1,4 +1,4 @@
-export const successGRPC = (message = 'Success', metadata = {}) => {
+export const successGRPC = ({ message = 'Success', metadata = {} } = {}) => {
     return {
         ok: true,
         message,
@@ -6,7 +6,7 @@ export const successGRPC = (message = 'Success', metadata = {}) => {
     };
 };
 
-export const failedGRPC = (message = 'Failed') => {
+export const failedGRPC = ({ message = 'Failed' } = {}) => {
     return {
         ok: false,
         message,

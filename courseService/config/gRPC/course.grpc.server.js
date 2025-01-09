@@ -1,9 +1,10 @@
 import grpc from '@grpc/grpc-js';
 import protoLoader from '@grpc/proto-loader';
 import dotenv from 'dotenv';
-import { CourseService } from '../../services/course.service.js';
+import { findCourseWithId } from '../../models/repositories/course.repo.js';
 import { failedGRPC, successGRPC } from '../../responses/grpc.response.js';
 import { CourseStatus } from '../../utils/couseStatus.js';
+import { requestHandler } from '../../helpers/requestHandler.js';
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ export const init = () => {
 
     // Add the service
     server.addService(coursePackage.CourseService.service, {
-        checkCourseOpen,
+        isCourseOpen,
     });
 
     const grpcServerAddress = `0.0.0.0:${process.env.courseGRPC}`;
@@ -31,16 +32,26 @@ export const init = () => {
     ); // our sever is insecure, no ssl configuration
 };
 
-const checkCourseOpen = async (call, callback) => {
-    const params = JSON.parse(call.request.infor);
-    const { id } = params;
-    console.log({ id });
-    const { course } = await CourseService.findById({ id });
-    if (course) console.log('[GRPC]: Check course open success!');
-    const open = course.status === CourseStatus.ACTIVE;
-    if (course) {
-        callback(null, successGRPC((metadata = { open })));
+const isCourseOpen = async (call, callback) => {
+    const fun = async () => {
+        const params = JSON.parse(call.request.infor);
+        const { id } = params;
+        const { course } = await findCourseWithId({ id });
+        const open = course.status === CourseStatus.ACTIVE;
+        return { open };
+    };
+    const [error, data] = await await requestHandler(fun());
+    if (!error) {
+        console.log('[GRPC]: Check course open success!');
+        callback(
+            null,
+            JSON.stringify(
+                successGRPC({
+                    metadata: data,
+                }),
+            ),
+        );
     } else {
-        callback(failedGRPC('Course not found'), null);
+        callback(failedGRPC({ message: 'Course not found' }), null);
     }
 };

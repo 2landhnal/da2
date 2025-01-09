@@ -3,11 +3,13 @@ syntax = 'proto3';
 package authPakage;
 
 service AuthService {
-    rpc createAccount (Account) returns (Empty);
+    rpc createAccount (Account) returns (Response);
 }
 
 message Account {
     string infor = 1;
 }
 
-message Empty {}
+message Response {
+    string response = 1;
+}

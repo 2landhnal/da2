@@ -19,7 +19,6 @@ router.get(
 // auth
 router.put('/changePassword', asyncHandler(authController.changePassword));
 // bdt required
-// router.use(bdtRequired);
-// router.get('/search', asyncHandler(authController.search));
+router.post('/sync', bdtRequired, asyncHandler(authController.syncStatus));
 
 export default router;

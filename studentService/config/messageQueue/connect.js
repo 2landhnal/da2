@@ -8,6 +8,8 @@ const listeningQueues = [
     'noti_send',
     'student_changeAvatarUrl',
     'student_changeAvatar',
+    'sync_infor',
+    'student_syncStatus',
 ];
 
 let channel;

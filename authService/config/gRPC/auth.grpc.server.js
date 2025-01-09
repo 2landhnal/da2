@@ -4,7 +4,8 @@ import dotenv from 'dotenv';
 import { AuthService } from '../../services/auth.service.js';
 import { generatePassword } from '../../helpers/index.js';
 import { sendToQueue } from '../messageQueue/connect.js';
-import { successGRPC } from '../../responses/grpc.response.js';
+import { failedGRPC, successGRPC } from '../../responses/grpc.response.js';
+import { requestHandler } from '../../helpers/requestHandler.js';
 
 dotenv.config();
 
@@ -34,10 +35,18 @@ export const init = () => {
 const createAccount = async (call, callback) => {
     const params = JSON.parse(call.request.infor);
     const password = generatePassword();
-    console.log({ password });
-    await AuthService.register({ ...params, password });
-    console.log('Create account from grpc success!');
+    const accountRequest = { ...params, password };
+    const fun = async () => {
+        await AuthService.register(accountRequest);
+        console.log('Create account from grpc success!');
+        return accountRequest;
+    };
+    const [error, data] = await await requestHandler(fun());
+    if (error) {
+        callback(failedGRPC({ message: error }), null);
+    } else {
+        callback(null, JSON.stringify(successGRPC({ metadata: data })));
+    }
     // Send noti
-    sendToQueue('noti_send', JSON.stringify({ ...params, password }));
-    callback(null, successGRPC((metadata = params)));
+    sendToQueue('noti_send', JSON.stringify(accountRequest));
 };
