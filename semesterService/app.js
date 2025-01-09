@@ -13,6 +13,7 @@ import compression from 'compression';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import { TimeCheckerController } from './controllers/timeChecker.controller.js';
+import { init } from './config/gRPC/semester.grpc.server.js';
 
 const app = express();
 
@@ -68,6 +69,9 @@ const startApp = async () => {
     if (firestore && bucket) {
         1 + 1;
     }
+
+    // grpc server
+    init();
 };
 
 startApp();

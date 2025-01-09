@@ -103,8 +103,7 @@ export class StudentService {
             role,
         });
 
-        let creatAccountOkey = (await gRPCAuthClient.createAccount({ infor }))
-            .ok;
+        let creatAccountOkey = await gRPCAuthClient.createAccount({ infor }).ok;
         if (!creatAccountOkey) {
             sendToQueue('student_delete', JSON.stringify({ uid }));
             throw new BadRequestError();

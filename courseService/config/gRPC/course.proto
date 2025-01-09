@@ -1,9 +1,10 @@
 syntax = 'proto3';
 
-package coursePakage;
+package coursePackage;
 
 service CourseService {
-    rpc isCourseOpen (Course) returns (BooleanResponse);
+    rpc isCourseActive (Course) returns (Response);
+    rpc getCourse (Course) returns (Response);
 }
 
 message Course {

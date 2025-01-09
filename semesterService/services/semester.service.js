@@ -192,6 +192,23 @@ export class SemesterService {
             }
         });
     };
+    static checkClosedSemester = async () => {
+        const now = Date.now();
+        const semesters = await SemesterRepo.querySemester({
+            query: {
+                status: SemesterStatus.CLOSED,
+            },
+        });
+        semesters.forEach(async (semester) => {
+            if (semester.endDate > now) {
+                await SemesterRepo.updateSemesterInfor({
+                    id: semester.id,
+                    status: SemesterStatus.ACTIVE,
+                });
+                console.log(`Updated ${semester}`);
+            }
+        });
+    };
     static checkProcessingSemester = async () => {
         const now = Date.now();
         const semesters = await SemesterRepo.querySemester({

@@ -1,15 +1,14 @@
 import grpc from '@grpc/grpc-js';
 import protoLoader from '@grpc/proto-loader';
 import dotenv from 'dotenv';
-import { successGRPC, failedGRPC } from '../../responses/grpc.response.js';
 
 dotenv.config();
 
 const packageDefinition = protoLoader.loadSync('config/gRPC/auth.proto', {});
-const authPakage = grpc.loadPackageDefinition(packageDefinition).authPakage;
+const authPackage = grpc.loadPackageDefinition(packageDefinition).authPackage;
 
-const authClient = new authPakage.AuthService(
-    `localhost:${process.env.authGRPC}`,
+const authClient = new authPackage.AuthService(
+    `${process.env.authService}:${process.env.authGRPC}`,
     // replace by service:grpcPort
     grpc.credentials.createInsecure(),
 );
@@ -20,10 +19,11 @@ export class gRPCAuthClient {
             authClient.createAccount({ infor }, (err, response) => {
                 if (err) {
                     console.error('Error creating account:', err);
-                    resolve(failedGRPC()); // Trả về false nếu có lỗi
+                    resolve(err); // Trả về false nếu có lỗi
                 } else {
-                    console.log('Account created:', response);
-                    resolve(successGRPC()); // Trả về true nếu thành công
+                    const data = JSON.parse(response.response);
+                    console.log('Account created:', data);
+                    resolve(data); // Trả về true nếu thành công
                 }
             });
         });

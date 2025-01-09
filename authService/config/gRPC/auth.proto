@@ -1,6 +1,6 @@
 syntax = 'proto3';
 
-package authPakage;
+package authPackage;
 
 service AuthService {
     rpc createAccount (Account) returns (Response);

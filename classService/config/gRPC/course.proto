@@ -1,15 +1,16 @@
 syntax = 'proto3';
 
-package coursePakage;
+package coursePackage;
 
 service CourseService {
-    rpc checkCourseOpen (Course) returns (BooleanResponse);
+    rpc isCourseActive (Course) returns (Response);
+    rpc getCourse (Course) returns (Response);
 }
 
 message Course {
     string infor = 1;
 }
 
-message BooleanResponse {
-    bool ans = 1; // Field to indicate if the course is open
+message Response {
+    string response = 1;
 }

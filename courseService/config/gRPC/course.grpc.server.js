@@ -18,7 +18,8 @@ export const init = () => {
 
     // Add the service
     server.addService(coursePackage.CourseService.service, {
-        isCourseOpen,
+        isCourseActive,
+        getCourse,
     });
 
     const grpcServerAddress = `0.0.0.0:${process.env.courseGRPC}`;
@@ -32,24 +33,43 @@ export const init = () => {
     ); // our sever is insecure, no ssl configuration
 };
 
-const isCourseOpen = async (call, callback) => {
+const isCourseActive = async (call, callback) => {
     const fun = async () => {
         const params = JSON.parse(call.request.infor);
         const { id } = params;
-        const { course } = await findCourseWithId({ id });
-        const open = course.status === CourseStatus.ACTIVE;
-        return { open };
+        const course = await findCourseWithId({ id });
+        const active = course.status === CourseStatus.ACTIVE;
+        return { active };
     };
     const [error, data] = await await requestHandler(fun());
     if (!error) {
-        console.log('[GRPC]: Check course open success!');
+        console.log('[GRPC]: Check course active success!');
         callback(
             null,
-            JSON.stringify(
-                successGRPC({
-                    metadata: data,
-                }),
-            ),
+            successGRPC({
+                metadata: data,
+            }),
+        );
+    } else {
+        callback(failedGRPC({ message: 'Course not found' }), null);
+    }
+};
+
+const getCourse = async (call, callback) => {
+    const fun = async () => {
+        const params = JSON.parse(call.request.infor);
+        const { id } = params;
+        const course = await findCourseWithId({ id });
+        return { course };
+    };
+    const [error, data] = await await requestHandler(fun());
+    if (!error) {
+        console.log('[GRPC]: Get course success!');
+        callback(
+            null,
+            successGRPC({
+                metadata: data,
+            }),
         );
     } else {
         callback(failedGRPC({ message: 'Course not found' }), null);

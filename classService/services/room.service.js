@@ -4,7 +4,7 @@ import {
     BadRequestError,
     AuthFailureError,
 } from '../responses/error.response.js';
-import { RoomRepo } from '../models/repositories/Room.repo.js';
+import { RoomRepo } from '../models/repositories/room.repo.js';
 import { getInfoData } from '../utils/index.js';
 import { tryGetFromCache } from '../helpers/redis.helper.js';
 import { roomKey, roomsKey } from '../config/redis/redis.config.js';

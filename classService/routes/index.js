@@ -12,9 +12,9 @@ router.get('/healthCheck', (req, res, next) => {
 });
 
 router.use(extractInfor);
-// router.use('/v1/api', classRouter);
 router.use('/v1/api/room', roomRouter);
 router.use('/v1/api/shift', shiftRouter);
+router.use('/v1/api', classRouter);
 router.use('/test', testRouter);
 
 export default router;

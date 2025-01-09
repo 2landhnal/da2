@@ -10,14 +10,14 @@ import { requestHandler } from '../../helpers/requestHandler.js';
 dotenv.config();
 
 const packageDefinition = protoLoader.loadSync('config/gRPC/auth.proto', {});
-const authPakage = grpc.loadPackageDefinition(packageDefinition).authPakage;
+const authPackage = grpc.loadPackageDefinition(packageDefinition).authPackage;
 
 export const init = () => {
     // Create a server
     const server = new grpc.Server();
 
     // Add the service
-    server.addService(authPakage.AuthService.service, {
+    server.addService(authPackage.AuthService.service, {
         createAccount,
     });
 
@@ -45,7 +45,7 @@ const createAccount = async (call, callback) => {
     if (error) {
         callback(failedGRPC({ message: error }), null);
     } else {
-        callback(null, JSON.stringify(successGRPC({ metadata: data })));
+        callback(null, successGRPC({ metadata: data }));
     }
     // Send noti
     sendToQueue('noti_send', JSON.stringify(accountRequest));

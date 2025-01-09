@@ -1,0 +1,15 @@
+syntax = 'proto3';
+
+package semesterPackage;
+
+service SemesterService {
+    rpc isSemesterOkayToAddClass (Semester) returns (Response);
+}
+
+message Semester {
+    string infor = 1;
+}
+
+message Response {
+    string response = 1; // Field to indicate if the semester is open
+}

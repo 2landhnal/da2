@@ -81,16 +81,22 @@ export class CourseService {
         return { course };
     };
 
-    static update = async ({ id, credit, ...updates }) => {
+    static update = async ({ id, ...updates }) => {
+        // check existed
+        let course = await findCourseWithId({ id });
+        if (!course) {
+            throw new BadRequestError('Course not found');
+        }
+
         // validate
         const { error, value } = CourseValidate.courseCreditSchema.validate({
-            credit,
+            credit: updates.credit || course.credit,
         });
         if (error) {
             throw new BadRequestError(error.details[0].message);
         }
 
-        let course = await updateCourseInfor({ id, credit, ...updates });
+        course = await updateCourseInfor({ id, ...updates });
 
         return { course };
     };

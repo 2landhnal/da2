@@ -1,5 +1,11 @@
 {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "files.associations": {
+        "*.ejs": "html",
+        "*.proto": "cpp",
+        "xstring": "cpp",
+        "system_error": "cpp"
+    }
     // "[typescript]": {
     //     "editor.defaultFormatter": null
     // }

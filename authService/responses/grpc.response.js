@@ -1,14 +1,25 @@
-export const successGRPC = ({ message = 'Success', metadata = {} } = {}) => {
+import * as grpc from '@grpc/grpc-js';
+export const successGRPC = ({
+    message = 'Success',
+    code = grpc.status.OK,
+    metadata = {},
+} = {}) => {
     return {
-        ok: true,
-        message,
-        metadata,
+        response: JSON.stringify({
+            ok: true,
+            code,
+            message,
+            metadata,
+        }),
     };
 };
 
-export const failedGRPC = ({ message = 'Failed' } = {}) => {
+export const failedGRPC = ({
+    code = grpc.status.NOT_FOUND,
+    message = 'Failed',
+} = {}) => {
     return {
-        ok: false,
+        code,
         message,
     };
 };

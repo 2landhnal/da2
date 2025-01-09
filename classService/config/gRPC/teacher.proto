@@ -1,9 +1,10 @@
 syntax = 'proto3';
 
-package teacherPakage;
+package teacherPackage;
 
 service TeacherService {
-    rpc isTeacherExist (Teacher) returns (Response);
+    rpc isTeacherActive (Teacher) returns (Response);
+    rpc getTeacher (Teacher) returns (Response);
 }
 
 message Teacher {

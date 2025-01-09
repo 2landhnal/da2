@@ -8,6 +8,7 @@ export class TimeCheckerController {
                 await SemesterService.checkProcessingSemester();
                 await SemesterService.checkOpenForRegistrationSemester();
                 await SemesterService.checkActiveSemester();
+                await SemesterService.checkClosedSemester();
                 console.log('TimeCheckerController.Check completed.');
             } catch (error) {
                 console.error('Error in TimeCheckerController.Check:', error);
