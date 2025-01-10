@@ -96,6 +96,16 @@ export class ClassRepo {
         }
     };
 
+    static findClassBySemesterId = async ({ semesterId }) => {
+        try {
+            const founds = await Class.find({ semesterId });
+            return founds;
+        } catch (error) {
+            console.error('Error finding class:', error);
+            throw error;
+        }
+    };
+
     static countClass = async () => {
         try {
             const count = await Class.countDocuments({});

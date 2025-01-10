@@ -11,6 +11,7 @@ import { firestore, bucket } from './config/firebase/index.js';
 import compression from 'compression';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
+import { init } from './config/gRPC/class.grpc.server.js';
 
 const app = express();
 
@@ -66,6 +67,9 @@ const startApp = async () => {
     if (firestore && bucket) {
         1 + 1;
     }
+
+    // grpc
+    init();
 };
 
 startApp();

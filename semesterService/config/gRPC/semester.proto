@@ -4,6 +4,7 @@ package semesterPackage;
 
 service SemesterService {
     rpc isSemesterOkayToAddClass (Semester) returns (Response);
+    rpc isStudentAllowed (Semester) returns (Response);
 }
 
 message Semester {

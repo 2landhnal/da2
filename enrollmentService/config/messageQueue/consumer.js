@@ -1,5 +1,5 @@
 'use strict';
-import { myConsume } from '../../helpers/mq.helper';
+import { myConsume } from '../../helpers/mq.helper.js';
 
 export async function setupConsumers(channel) {
     try {

@@ -15,8 +15,8 @@ class TeacherController {
 
     search = async (req, res, next) => {
         const metadata = await TeacherService.search({
-            ...req.query,
             header_role: req.header_role,
+            ...req.query,
         });
         new SuccessResponse({
             message: 'Search successfully!',
@@ -26,9 +26,9 @@ class TeacherController {
 
     findByUid = async (req, res, next) => {
         const metadata = await TeacherService.findByUid({
-            ...req.params,
             header_role: req.header_role,
             header_uid: req.header_uid,
+            ...req.params,
         });
         new SuccessResponse({
             message: 'Search successfully!',
@@ -40,9 +40,9 @@ class TeacherController {
         new CREATED({
             message: 'Update information successfully!',
             metadata: await TeacherService.update({
-                ...req.body,
                 header_role: req.header_role,
                 header_uid: req.header_uid,
+                ...req.body,
             }),
         }).send(res);
     };
@@ -51,10 +51,10 @@ class TeacherController {
         new OK({
             message: 'Change avatar successfully!',
             metadata: await TeacherService.changeAvatar({
-                ...req.body,
                 header_role: req.header_role,
                 header_uid: req.header_uid,
                 file: req.file,
+                ...req.body,
             }),
         }).send(res);
     };

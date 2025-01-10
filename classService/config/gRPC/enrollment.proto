@@ -1,0 +1,16 @@
+syntax = 'proto3';
+
+package enrollmentPackage;
+
+service EnrollmentService {
+    // {classId}
+    rpc getCurrentEnrollment (Enrollment) returns (Response);
+}
+
+message Enrollment {
+    string infor = 1;
+}
+
+message Response {
+    string response = 1;
+}

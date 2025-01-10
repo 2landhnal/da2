@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { failedGRPC, successGRPC } from '../../responses/grpc.response.js';
 import { requestHandler } from '../../helpers/requestHandler.js';
 import { SemesterRepo } from '../../models/repositories/semester.repo.js';
+import { ScheduleService } from '../../services/schedule.service.js';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ export const init = () => {
     // Add the service
     server.addService(semesterPackage.SemesterService.service, {
         isSemesterOkayToAddClass,
+        isStudentAllowed,
     });
 
     const address = `0.0.0.0:${process.env.semesterGRPC}`;
@@ -38,6 +40,27 @@ const isSemesterOkayToAddClass = async (call, callback) => {
         const okay = now <= semester.startDate;
         console.log('Check semester okay to add class from grpc success!');
         return { okay };
+    };
+    const [error, data] = await await requestHandler(fun());
+    if (error) {
+        callback(failedGRPC({ message: error }), null);
+    } else {
+        callback(null, successGRPC({ metadata: data }));
+    }
+};
+
+const isStudentAllowed = async (call, callback) => {
+    const fun = async () => {
+        const { yoa, semesterId } = JSON.parse(call.request.infor);
+        const { accessible, semesterIds } = await ScheduleService.checkAccess({
+            yoa,
+        });
+        let allowed = false;
+        if (accessible) {
+            allowed = semesterIds.includes(semesterId);
+        }
+        console.log('Check isStudentAllow from grpc success!');
+        return { allowed };
     };
     const [error, data] = await await requestHandler(fun());
     if (error) {

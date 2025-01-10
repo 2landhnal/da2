@@ -98,3 +98,8 @@ export const enrollmentsKey = {
         `enrollments:${page}:${resultPerPage}:${JSON.stringify(query)}`,
     expireTimeInMinute: testTime || 60,
 };
+
+export const studentsInClass = {
+    key: (classId) => `studentsInClass:${classId}`,
+    expireTimeInMinute: testTime || 60,
+};

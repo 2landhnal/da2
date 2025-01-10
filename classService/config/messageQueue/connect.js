@@ -3,7 +3,7 @@ import amqp from 'amqplib';
 import { setupConsumers } from './consumer.js';
 
 let channel;
-const listeningQueues = ['testMQ'];
+const listeningQueues = ['testMQ', 'class_syncEnroll'];
 
 export async function connectRabbitMQ() {
     try {

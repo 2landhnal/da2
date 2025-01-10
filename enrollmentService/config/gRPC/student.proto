@@ -1,0 +1,15 @@
+syntax = 'proto3';
+
+package studentPackage;
+
+service StudentService {
+    rpc getStudent (Student) returns (Response);
+}
+
+message Student {
+    string infor = 1;
+}
+
+message Response {
+    string response = 1;
+}

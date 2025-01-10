@@ -1,0 +1,15 @@
+syntax = 'proto3';
+
+package classPackage;
+
+service ClassService {
+    rpc getClass (Class) returns (Response);
+}
+
+message Class {
+    string infor = 1;
+}
+
+message Response {
+    string response = 1;
+}

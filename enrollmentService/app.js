@@ -8,11 +8,10 @@ import router from './routes/index.js';
 import { connectRabbitMQ } from './config/messageQueue/connect.js';
 import { connectMongoose } from './config/mongo/index.js';
 import { firestore, bucket } from './config/firebase/index.js';
-import { redisClient } from './config/redis/index.js';
 import compression from 'compression';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import { init } from './config/gRPC/course.grpc.server.js';
+import { init } from './config/gRPC/enrollment.grpc.server.js';
 
 const app = express();
 

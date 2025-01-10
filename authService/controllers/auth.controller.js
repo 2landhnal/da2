@@ -41,8 +41,8 @@ class AuthController {
 
     changePassword = async (req, res, next) => {
         const metadata = await AuthService.changePassword({
-            ...req.body,
             uid: req.headers[HEADER.UID],
+            ...req.body,
         });
         new SuccessResponse({
             message: 'Chnage password successfully!',

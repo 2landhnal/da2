@@ -183,7 +183,16 @@ export class ScheduleService {
     };
 
     static update = async ({ _id, startDate, endDate, timeSlots }) => {
-        timeSlots = timeSlots || [];
+        // check existed
+        const hoddedSchedule = await ScheduleRepo.findScheduleWithId({
+            _id,
+        });
+        if (!hoddedSchedule) {
+            throw new BadRequestError(`Schedule with _id ${_id} not existed`);
+        }
+        timeSlots = timeSlots || hoddedSchedule.timeSlots;
+        startDate = startDate || hoddedSchedule.startDate;
+        endDate = endDate || hoddedSchedule.endDate;
         // validate
         let { error, value } = ScheduleValidate.scheduleSchema.validate({
             id: _id.split('_')[1],
@@ -211,14 +220,6 @@ export class ScheduleService {
                 throw new BadRequestError(error.details[0].message);
             }
         });
-
-        // check existed
-        const hoddedSchedule = await ScheduleRepo.findScheduleWithId({
-            _id,
-        });
-        if (!hoddedSchedule) {
-            throw new BadRequestError(`Schedule with _id ${_id} not existed`);
-        }
 
         // check overlap with semester
         const semester = await SemesterRepo.findSemesterWithId({
