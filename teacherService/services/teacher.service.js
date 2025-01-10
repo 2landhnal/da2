@@ -101,9 +101,16 @@ export class TeacherService {
         // upload avatar via mq
         if (avatar) {
             MqService.uploadAvatar({ avatar, uid });
+        } else {
+            sendToQueue(
+                'sync_infor',
+                JSON.stringify({
+                    role: RoleCode.TEACHER,
+                    ...newTeacher.toObject(),
+                }),
+            );
         }
 
-        sendToQueue('teacher', JSON.stringify(newTeacher));
         return { newTeacher };
     };
 

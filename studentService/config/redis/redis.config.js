@@ -15,6 +15,11 @@ export const studentsKey = {
     expireTimeInMinute: testTime || 60,
 };
 
+export const numberOfStudentWithYoaKey = {
+    key: (yoa) => `numberOfStudentWithYoa:${yoa}`,
+    expireTimeInMinute: testTime || 60,
+};
+
 export const courseKey = {
     key: (id) => `course:${id}`,
     expireTimeInMinute: testTime || 60,

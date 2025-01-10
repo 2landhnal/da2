@@ -45,9 +45,9 @@ export const queryAccount = async ({ page, resultPerPage, query }) => {
     }
 };
 
-export const deleteAccountByUid = async ({ uid }) => {
+export const deleteAccountByEmail = async ({ email }) => {
     try {
-        const found = await Account.findOne({ uid });
+        const found = await Account.findOne({ email });
         return found;
     } catch (error) {
         console.error('Error delete account:', error);

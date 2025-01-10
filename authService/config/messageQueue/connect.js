@@ -9,6 +9,7 @@ const liseningQueues = [
     'noti_send',
     'student_syncStatus',
     'teacher_syncStatus',
+    'account_delete',
 ];
 
 export async function connectRabbitMQ() {

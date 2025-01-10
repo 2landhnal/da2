@@ -1,41 +1,34 @@
 'use strict';
-import { requestHandler } from '../../helpers/requestHandler.js';
 import { AuthService } from '../../services/auth.service.js';
+import { myConsume } from '../../helpers/mq.helper.js';
+import {
+    deleteAccountByEmail,
+    findAccountWithEmail,
+} from '../../models/repositories/account.repo.js';
 
 export const setupConsumers = (channel) => {
     try {
-        channel.consume('testMQ', (msg) => {
-            if (msg !== null) {
-                console.log(`[x] Received: ${msg.content.toString()}`);
-                channel.ack(msg); // Xác nhận đã xử lý thông điệp
-            }
+        myConsume({ channel, queue: 'testMQ' });
+        myConsume({ channel, queue: 'noti_send' });
+        myConsume({
+            channel,
+            queue: 'sync_infor',
+            callback: async ({ msgObject, queue }) => {
+                await AuthService.syncInfor(msgObject);
+            },
         });
-
-        channel.consume('noti_send', (msg) => {
-            if (msg !== null) {
-                console.log(`[x] Received: ${msg.content.toString()}`);
-                channel.ack(msg); // Xác nhận đã xử lý thông điệp
-            }
-        });
-
-        channel.consume('sync_infor', async (msg) => {
-            if (msg !== null) {
-                const msgObject = JSON.parse(msg.content.toString());
-                if (msgObject === null) {
-                    console.log('Null massage, skipped');
-                    channel.ack(msg);
+        myConsume({
+            channel,
+            queue: 'account_delete',
+            callback: async ({ msgObject, queue }) => {
+                const { email } = msgObject;
+                const account = await findAccountWithEmail({ email });
+                if (!account) {
+                    console.log(`[${queue}]: Account not exist, ack`);
                     return;
                 }
-                console.log(`[x] Received: ${JSON.stringify(msgObject)}`);
-                const [error, data] = await await requestHandler(
-                    AuthService.syncInfor(msgObject),
-                );
-                if (error) {
-                    console.log(error);
-                    return;
-                }
-                channel.ack(msg); // Xác nhận đã xử lý thông điệp
-            }
+                await deleteAccountByEmail({ email });
+            },
         });
     } catch (err) {
         console.error('Error setting up consumers:', err);

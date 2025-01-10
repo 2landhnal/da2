@@ -13,6 +13,7 @@ router.post(
     upload.single('avatar'),
     asyncHandler(studentController.changeAvatar),
 );
+router.post('/sync', bctsvRequired, asyncHandler(studentController.syncInfor));
 router.post(
     '/',
     bctsvRequired,

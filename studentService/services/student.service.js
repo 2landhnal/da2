@@ -8,6 +8,7 @@ import {
     removeRefreshToken,
     saveRefreshToken,
     isRefreshTokenValid,
+    incr,
 } from '../models/repositories/redis.repo.js';
 import {
     BadRequestError,
@@ -23,17 +24,18 @@ import {
     updateStudentInfor,
 } from '../models/repositories/student.repo.js';
 import { getInfoData } from '../utils/index.js';
-import jwt from 'jsonwebtoken';
 import { AccountStatus } from '../utils/accountStatus.js';
 import { NUMBER_OF_SUFFIX_STUDENT_ID } from '../config/const.config.js';
 import { nameToPrefix } from '../helpers/student.helper.js';
-import Student from '../models/student.model.js';
 import { RoleCode } from '../utils/roleCode.js';
 import { gRPCAuthClient } from '../config/gRPC/auth.grpc.client.js';
 import { tryGetFromCache } from '../utils/redis.utils.js';
-import { studentKey, studentsKey } from '../config/redis/redis.config.js';
+import {
+    studentKey,
+    studentsKey,
+    numberOfStudentWithYoaKey,
+} from '../config/redis/redis.config.js';
 import { FirebaseRepo } from '../models/repositories/firebase.repo.js';
-import { TmpRepo } from '../models/repositories/tmp.repo.js';
 import { MqService } from './mq.service.js';
 
 export class StudentService {
@@ -70,7 +72,13 @@ export class StudentService {
             }
         }
 
-        const numberOfStudentWithYoa = await getNumberOfStudentWithYoa({ yoa });
+        const numberOfStudentWithYoa = await tryGetFromCache(
+            numberOfStudentWithYoaKey.key(yoa),
+            numberOfStudentWithYoaKey.expireTimeInMinute,
+            async () => {
+                return await getNumberOfStudentWithYoa({ yoa });
+            },
+        );
         // gen studentId = yoa + index
         const uid = `${yoa}${numberOfStudentWithYoa
             .toString()
@@ -103,17 +111,28 @@ export class StudentService {
             role,
         });
 
-        let creatAccountOkey = await gRPCAuthClient.createAccount({ infor }).ok;
+        let creatAccountOkey = (await gRPCAuthClient.createAccount({ infor }))
+            .ok;
         if (!creatAccountOkey) {
             sendToQueue('student_delete', JSON.stringify({ uid }));
+            sendToQueue('account_delete', JSON.stringify({ email }));
             throw new BadRequestError();
         }
         // upload avatar via mq
         if (avatar) {
             MqService.uploadAvatar({ avatar, uid });
+        } else {
+            sendToQueue(
+                'sync_infor',
+                JSON.stringify({
+                    role: RoleCode.STUDENT,
+                    ...newStudent.toObject(),
+                }),
+            );
         }
 
-        sendToQueue('sync_student', JSON.stringify(newStudent));
+        // incr
+        incr(numberOfStudentWithYoaKey.key(yoa));
         return { newStudent };
     };
 
@@ -151,6 +170,35 @@ export class StudentService {
                 totalResults: students.length,
             },
         };
+    };
+
+    static syncInfor = async () => {
+        // validate
+        const page = 1;
+        const resultPerPage = 100000;
+        const query = {};
+
+        // query
+        let students;
+        students = await tryGetFromCache(
+            studentsKey.key(page, resultPerPage, query),
+            studentsKey.expireTimeInMinute,
+            async () => {
+                return await queryStudent({ page, resultPerPage, query });
+            },
+        );
+
+        // loop
+        students = students.forEach((student) => {
+            sendToQueue(
+                'sync_infor',
+                JSON.stringify({
+                    role: RoleCode.STUDENT,
+                    ...student.toObject(),
+                }),
+            );
+        });
+        return {};
     };
 
     static findByUid = async ({ uid, header_role, header_uid }) => {
@@ -201,10 +249,12 @@ export class StudentService {
         }
         student = await updateStudentInfor({
             uid,
-            role: RoleCode.STUDENT,
             ...updates,
         });
-        sendToQueue('sync_infor', JSON.stringify(student));
+        sendToQueue(
+            'sync_infor',
+            JSON.stringify({ role: RoleCode.STUDENT, ...student.toObject() }),
+        );
         return { student };
     };
 

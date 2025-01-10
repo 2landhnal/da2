@@ -10,6 +10,7 @@ const listeningQueues = [
     'student_changeAvatar',
     'sync_infor',
     'student_syncStatus',
+    'account_delete',
 ];
 
 let channel;

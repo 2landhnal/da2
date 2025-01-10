@@ -25,6 +25,14 @@ class StudentController {
         }).send(res);
     };
 
+    syncInfor = async (req, res, next) => {
+        const metadata = await StudentService.syncInfor();
+        new SuccessResponse({
+            message: 'Sync successfully!',
+            metadata,
+        }).send(res);
+    };
+
     findByUid = async (req, res, next) => {
         const metadata = await StudentService.findByUid({
             ...req.params,
