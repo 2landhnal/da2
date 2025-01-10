@@ -23,13 +23,13 @@ export const init = () => {
         getCurrentEnrollment,
     });
 
+    const grpcAddress = `0.0.0.0:${process.env.enrollmentGRPC}`;
+
     server.bindAsync(
-        `0.0.0.0:${process.env.enrollmentGRPC}`,
+        grpcAddress,
         grpc.ServerCredentials.createInsecure(),
         () => {
-            console.log(
-                `GRPC server running at 0.0.0.0:${process.env.enrollmentGRPC}`,
-            );
+            console.log(`GRPC server running at ${grpcAddress}`);
         },
     ); // our sever is insecure, no ssl configuration
 };
@@ -38,16 +38,17 @@ const getCurrentEnrollment = async (call, callback) => {
     const fun = async () => {
         const params = JSON.parse(call.request.infor);
         const { classId } = params;
-        const curentEnrollment = await EnrollmentRepo.getNumberOfStudentInClass(
-            {
+        console.log(params);
+        const currentEnrollment =
+            await EnrollmentRepo.getNumberOfStudentInClass({
                 classId,
-            },
-        );
-        return { curentEnrollment };
+            });
+        console.log({ currentEnrollment });
+        return { currentEnrollment };
     };
     const [error, data] = await await requestHandler(fun());
     if (!error) {
-        console.log('[GRPC]: Get current enrollment success!');
+        console.log('[GRPC]: Get current enrollment success!', data);
         callback(
             null,
             successGRPC({
@@ -55,6 +56,7 @@ const getCurrentEnrollment = async (call, callback) => {
             }),
         );
     } else {
+        console.log('[GRPC]: Get current enrollment failed!', error);
         callback(failedGRPC({ message: 'Enrollment not found' }), null);
     }
 };

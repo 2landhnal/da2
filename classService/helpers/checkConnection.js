@@ -26,3 +26,33 @@ export const checkOverload = () => {
         }
     }, _SECONDS); // Monitor every 5 seconds
 };
+
+export const checkConnectionGRPC = async (client) => {
+    return new Promise((resolve, reject) => {
+        const channel = client.getChannel();
+        const currentState = channel.getConnectivityState(true);
+
+        channel.watchConnectivityState(
+            currentState,
+            Date.now() + 5000,
+            (err) => {
+                if (err) {
+                    reject(new Error('Failed to connect: ' + err.message));
+                } else {
+                    const newState = channel.getConnectivityState(true);
+                    if (newState === grpc.connectivityState.READY) {
+                        console.log('Successfully connected to service.');
+                        resolve(true);
+                    } else {
+                        reject(
+                            new Error(
+                                'Connection not ready. Current state: ' +
+                                    newState,
+                            ),
+                        );
+                    }
+                }
+            },
+        );
+    });
+};

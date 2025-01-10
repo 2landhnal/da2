@@ -146,4 +146,29 @@ export class ClassRepo {
             throw error;
         }
     };
+
+    static updateClassInfor = async ({ id, ...updates }) => {
+        try {
+            const updatedClass = await Class.findOneAndUpdate(
+                { id },
+                { $set: updates },
+                { new: true }, // Return the updated document
+            );
+            return updatedClass;
+        } catch (error) {
+            console.error('Error updating class:', error);
+            throw error;
+        }
+    };
+    static getClassesInSemester = async ({ semesterId }) => {
+        try {
+            const uniqueClasses = await Class.find({ semesterId }).select(
+                'id currentEnroll maxCapacity',
+            );
+            return uniqueClasses;
+        } catch (error) {
+            console.error('Error searching class:', error);
+            throw error;
+        }
+    };
 }

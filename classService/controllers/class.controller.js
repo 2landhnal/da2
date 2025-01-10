@@ -41,4 +41,11 @@ export class ClassController {
             metadata: await ClassService.update(req.body),
         }).send(res);
     };
+
+    static finish = async (req, res, next) => {
+        new CREATED({
+            message: 'Finish class enroll successfully!',
+            metadata: await ClassService.finish(req.body),
+        }).send(res);
+    };
 }

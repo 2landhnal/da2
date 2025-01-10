@@ -49,6 +49,30 @@ class EnrollmentController {
         }).send(res);
     };
 
+    getNumberOfStudentInClass = async (req, res, next) => {
+        const metadata = await EnrollmentService.getNumberOfStudentInClass({
+            header_role: req.header_role,
+            header_uid: req.header_uid,
+            ...req.params,
+        });
+        new SuccessResponse({
+            message: 'Search successfully!',
+            metadata,
+        }).send(res);
+    };
+
+    getStudentCurrentUsedCredit = async (req, res, next) => {
+        const metadata = await EnrollmentService.getStudentCurrentUsedCredit({
+            header_role: req.header_role,
+            header_uid: req.header_uid,
+            ...req.query,
+        });
+        new SuccessResponse({
+            message: 'Search successfully!',
+            metadata,
+        }).send(res);
+    };
+
     delete = async (req, res, next) => {
         new SuccessResponse({
             message: 'Delete enrollment successfully!',

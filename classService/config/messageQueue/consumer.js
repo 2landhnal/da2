@@ -9,15 +9,23 @@ export async function setupConsumers(channel) {
         myConsume({
             channel,
             queue: 'class_syncEnroll',
-            callback: async (msgObject, queue) => {
-                const currentEnroll =
-                    await gRPCEnrollmentClient.getCurrentEnrollment(
-                        JSON.stringify({ msgObject }),
-                    );
+            callback: async ({ msgObject, queue }) => {
+                const { currentEnrollment: currentEnroll } = (
+                    await gRPCEnrollmentClient.getCurrentEnrollment({
+                        infor: JSON.stringify(msgObject),
+                    })
+                ).metadata;
                 await ClassRepo.updateClassInfor({
                     id: msgObject.classId,
                     currentEnroll,
                 });
+            },
+        });
+        myConsume({
+            channel,
+            queue: 'class_finishEnrollment',
+            callback: async ({ msgObject, queue }) => {
+                await ClassRepo.updateClassInfor(msgObject);
             },
         });
     } catch (err) {

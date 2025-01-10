@@ -19,6 +19,8 @@ import { CheckService } from './check.service.js';
 import { gRPCTeacherClient } from '../config/gRPC/teacher.grpc.client.js';
 import { gRPCCourseClient } from '../config/gRPC/course.grpc.client.js';
 import { gRPCSemesterClient } from '../config/gRPC/semester.grpc.client.js';
+import { sendToQueue } from '../config/messageQueue/connect.js';
+import { ClassStatus } from '../utils/classStatus.js';
 
 export class ClassService {
     static create = async ({
@@ -29,9 +31,8 @@ export class ClassService {
         maxCapacity,
         schedule,
         teamCode,
-        courseName,
-        teacherName,
         currentEnroll,
+        status,
     }) => {
         // validate
         const numberOfClass = await ClassRepo.countClass();
@@ -114,6 +115,7 @@ export class ClassService {
             courseName: course.name,
             teacherName: teacher.fullname,
             currentEnroll,
+            status,
         });
         return { class: _class };
     };
@@ -173,6 +175,37 @@ export class ClassService {
         return { courses };
     };
 
+    static finish = async ({ semesterId }) => {
+        const classes = await ClassRepo.getClassesInSemester({ semesterId });
+        const open = classes.filter(
+            (e) => e.currentEnroll >= e.maxCapacity / 5,
+        );
+        const close = classes.filter(
+            (e) => e.currentEnroll < e.maxCapacity / 5,
+        );
+        open.forEach((e) => {
+            sendToQueue(
+                'enrollment_finishEnrollment',
+                JSON.stringify({ classId: e.id, status: ClassStatus.ACTIVE }),
+            );
+            sendToQueue(
+                'class_finishEnrollment',
+                JSON.stringify({ id: e.id, status: ClassStatus.ACTIVE }),
+            );
+        });
+        close.forEach((e) => {
+            sendToQueue(
+                'enrollment_finishEnrollment',
+                JSON.stringify({ classId: e.id, status: ClassStatus.CLOSED }),
+            );
+            sendToQueue(
+                'class_finishEnrollment',
+                JSON.stringify({ id: e.id, status: ClassStatus.CLOSED }),
+            );
+        });
+        return { open, close };
+    };
+
     static update = async ({
         id,
         courseId,
@@ -184,12 +217,14 @@ export class ClassService {
         courseName,
         teacherName,
         currentEnroll,
+        status,
     }) => {
         // check exist
         const hoodedClass = await ClassRepo.findClassById({ id });
         if (!hoodedClass) {
             throw new BadRequestError('Class not existed');
         }
+        status = status || hoodedClass.status;
         courseId = courseId || hoodedClass.courseId;
         roomId = roomId || hoodedClass.roomId;
         teacherId = teacherId || hoodedClass.teacherId;
@@ -228,10 +263,9 @@ export class ClassService {
         let infor;
         // check isTeacherActive
         infor = JSON.stringify({ uid: teacherId });
-        if (
-            !(await gRPCTeacherClient.isTeacherActive({ infor })).metadata
-                .active
-        ) {
+        const res = await gRPCTeacherClient.isTeacherActive({ infor });
+        console.log(res);
+        if (!res.metadata.active) {
             throw new BadRequestError('Teacher not available');
         }
         // check isCourseActive
@@ -274,6 +308,7 @@ export class ClassService {
             courseName,
             teacherName,
             currentEnroll,
+            status,
         });
 
         return { class: _class };

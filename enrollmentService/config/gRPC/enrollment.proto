@@ -3,7 +3,6 @@ syntax = 'proto3';
 package enrollmentPackage;
 
 service EnrollmentService {
-    // {classId}
     rpc getCurrentEnrollment (Enrollment) returns (Response);
 }
 

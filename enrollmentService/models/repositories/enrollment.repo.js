@@ -117,16 +117,16 @@ export class EnrollmentRepo {
             const count = await Enrollment.countDocuments({ classId });
             return count;
         } catch (error) {
-            console.error('Error finding Enrollment:', error);
+            console.error('Error finding enrollment:', error);
             throw error;
         }
     };
 
-    static closeEnrollements = async ({ classId }) => {
+    static finishEnrollements = async ({ classId, status }) => {
         try {
             const result = await Enrollment.updateMany(
                 { classId }, // Điều kiện lọc
-                { $set: { status: EnrollmentStatus.CLOSED } }, // Thay đổi cần áp dụng
+                { $set: { status } }, // Thay đổi cần áp dụng
             );
 
             console.log('Enrollments updated:', result);

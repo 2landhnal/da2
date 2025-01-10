@@ -189,6 +189,20 @@ export class EnrollmentService {
         return courses;
     };
 
+    static getNumberOfStudentInClass = async ({ classId, header_role }) => {
+        // auth
+        const auth = header_role === RoleCode.BDT;
+        if (!auth) {
+            throw new AuthFailureError();
+        }
+
+        // get from db
+        const count = await EnrollmentRepo.getNumberOfStudentInClass({
+            classId,
+        });
+        return { count };
+    };
+
     static getStudentInClass = async ({ classId, header_role, header_uid }) => {
         // check is students in class
         const students = await tryGetFromCache(
@@ -210,6 +224,26 @@ export class EnrollmentService {
             throw new AuthFailureError();
         }
         return { students };
+    };
+
+    static getStudentCurrentUsedCredit = async ({
+        studentId,
+        semesterId,
+        header_uid,
+        header_role,
+    }) => {
+        // auth
+        const auth =
+            header_role === RoleCode.BDT ||
+            (header_role === RoleCode.STUDENT && header_uid === studentId);
+        if (!auth) {
+            throw new AuthFailureError();
+        }
+        const credit = await EnrollmentRepo.getStudentEnrollmentCredit({
+            studentId,
+            semesterId,
+        });
+        return { credit };
     };
 
     static delete = async ({
@@ -268,11 +302,14 @@ export class EnrollmentService {
             }
         }
 
-        await EnrollmentRepo.deleteEnrollment({ studentId, classIds });
+        const enrollments = await EnrollmentRepo.deleteEnrollment({
+            studentId,
+            classIds,
+        });
         // sync class enrollment
         classIds.forEach((classId) => {
             sendToQueue('class_syncEnroll', JSON.stringify({ classId }));
         });
-        return;
+        return { enrollments };
     };
 }

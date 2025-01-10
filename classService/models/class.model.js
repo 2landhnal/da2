@@ -1,5 +1,6 @@
 'use strict';
 import mongoose from 'mongoose';
+import { ClassStatus } from '../utils/classStatus.js';
 
 const DOCUMENT_NAME = 'Class';
 const COLLECTION_NAME = 'Classs';
@@ -23,6 +24,11 @@ const ClassSchema = new mongoose.Schema(
         courseName: { type: String },
         teacherName: { type: String },
         currentEnroll: { type: Number },
+        status: {
+            type: String,
+            enum: Object.values(ClassStatus),
+            default: ClassStatus.ACTIVE,
+        },
     },
     {
         collection: COLLECTION_NAME,

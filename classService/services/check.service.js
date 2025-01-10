@@ -90,7 +90,7 @@ export class CheckService {
                                 newStartShift <= existingStartShift)
                         ) {
                             throw new BadRequestError(
-                                `Schedule conflict: Teacher ${roomId} is already teached on day ${newDayOfWeek} from shift ${existingStartShift} to shift ${existingEndShift}.`,
+                                `Schedule conflict: Teacher ${teacherId} is already teached on day ${newDayOfWeek} from shift ${existingStartShift} to shift ${existingEndShift}.`,
                             );
                         }
                     }

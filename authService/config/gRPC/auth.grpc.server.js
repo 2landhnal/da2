@@ -21,13 +21,13 @@ export const init = () => {
         createAccount,
     });
 
+    const grpcAddress = `0.0.0.0:${process.env.authGRPC}`;
+
     server.bindAsync(
-        `0.0.0.0:${process.env.authGRPC}`,
+        grpcAddress,
         grpc.ServerCredentials.createInsecure(),
         () => {
-            console.log(
-                `GRPC server running at 0.0.0.0:${process.env.authGRPC}`,
-            );
+            console.log(`GRPC server running at ${grpcAddress}`);
         },
     ); // our sever is insecure, no ssl configuration
 };
