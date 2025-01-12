@@ -1,6 +1,5 @@
 import { sendToQueue } from '../config/messageQueue/connect.js';
 import { TmpRepo } from '../models/repositories/tmp.repo.js';
-import { RoleCode } from '../utils/roleCode.js';
 export class MqService {
     static uploadAvatar = ({ avatar, uid }) => {
         const { mimetype, originalname, size } = avatar;
@@ -16,9 +15,8 @@ export class MqService {
             size,
             filePath,
             uid,
-            header_role: RoleCode.BCTSV,
         };
-        console.log(msgObject);
+        console.log('Avatar tmp object: ', msgObject);
         sendToQueue('student_changeAvatar', JSON.stringify(msgObject));
         return true;
     };

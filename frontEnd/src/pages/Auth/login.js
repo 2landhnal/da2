@@ -22,21 +22,22 @@ function Login() {
     const handleLogin = async () => {
         const email = formData.email;
         const password = formData.password;
-        try {
-            let response = await fetchPost(
-                authUrl,
-                '/login',
-                JSON.stringify({ email, password }),
-                {},
-                true,
-            );
-            console.log(response);
+        let response;
+        response = await fetchPost({
+            base: authUrl,
+            path: '/login',
+            body: { email, password },
+            cookies: true,
+        });
+        if (response.ok) {
             localStorage.setItem('accessToken', response.metadata.accessToken);
             toast.success('Login success', { autoClose: 3000 });
             navigate(routePath.home, { replace: true });
-        } catch (error) {
-            toast.error('Invalid information', { autoClose: 3000 });
-            console.error(`Login failed: ${error.message}`);
+        } else {
+            toast.error(response.message || 'Invalid information', {
+                autoClose: 3000,
+            });
+            console.error(`Login failed: ${response.message}`);
         }
     };
 

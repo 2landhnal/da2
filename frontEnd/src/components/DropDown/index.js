@@ -20,7 +20,7 @@ function DropDown({
         <Tippy
             hideOnClick={hideOnClick}
             interactive
-            delay={[0, 500]}
+            delay={[0, 100]}
             placement="bottom"
             onHide={onHide}
             render={(attrs) => (

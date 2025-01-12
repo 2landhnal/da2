@@ -24,6 +24,59 @@ body {
     text-rendering: optimizespeed;
 }
 
+h1 {
+    text-align: center;
+    color: #1a1a1a;
+    font-size: 2rem;
+    font-weight: 500;
+}
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #1a1a1a;
+    font-size: 1.5rem;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    background-color: #f1f3f4;
+    border-radius: 4px;
+    font-size: 1.4rem;
+    transition: background-color 0.2s ease;
+}
+
+input:focus {
+    outline: 2px solid var(--blue);
+    background-color: #e8eaed;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input:read-only,
+select:read-only {
+    background-color: #e9ecef; /* Màu nền khác biệt */
+    color: #6c757d; /* Màu chữ nhạt */
+    cursor: not-allowed; /* Hiển thị icon cấm */
+}
+
+input:read-only:focus,
+select:read-only:focus {
+    outline: none; /* Loại bỏ viền khi focus */
+    background-color: #e9ecef; /* Giữ nguyên màu nền */
+}
+
+input::placeholder {
+    color: #70757a;
+}
+
 a {
     text-decoration: none;
 }

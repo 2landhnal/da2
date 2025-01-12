@@ -242,16 +242,7 @@ export class TeacherService {
             throw new BadRequestError(`Teacher with id ${uid} not existed`);
         }
 
-        const fileExtension = file.originalname.split('.').pop();
-        const pathToSave = `avatar/teacher/${uid}.${fileExtension}`;
-        const { fileUpload, publicUrl } = await FirebaseRepo.uploadFile({
-            pathToSave,
-            file,
-        });
-        sendToQueue(
-            'teacher_changeAvatarUrl',
-            JSON.stringify({ avatar: publicUrl, header_role, header_uid, uid }),
-        );
+        MqService.uploadAvatar({ avatar: file, uid });
         return { publicUrl };
     };
 }

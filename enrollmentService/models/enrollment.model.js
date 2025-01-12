@@ -17,8 +17,11 @@ const EnrollmentSchema = new mongoose.Schema(
         classId: { type: String, required: true },
         semesterId: { type: String, required: true },
         schedule: { type: [ScheduleShema], required: true },
+        courseId: { type: String },
         courseCredit: { type: Number },
         courseName: { type: String },
+        teacherName: { type: String },
+        teacherId: { type: String },
         studentName: { type: String },
         studentAvatar: { type: String },
         status: {

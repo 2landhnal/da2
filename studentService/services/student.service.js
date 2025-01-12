@@ -1,5 +1,6 @@
 'use strict';
 import StudentValidate from '../validate/student.validate.js';
+import { HelpService } from './help.service.js';
 import { sendToQueue } from '../config/messageQueue/connect.js';
 import {
     pushToList,
@@ -259,6 +260,7 @@ export class StudentService {
     };
 
     static changeAvatar = async ({ file, uid, header_role, header_uid }) => {
+        console.log({ header_role, header_uid });
         // authorize
         const auth =
             header_role === RoleCode.BCTSV ||
@@ -282,17 +284,7 @@ export class StudentService {
         if (!student) {
             throw new BadRequestError(`Student with id ${uid} not existed`);
         }
-
-        const fileExtension = file.originalname.split('.').pop();
-        const pathToSave = `avatar/student/${uid}.${fileExtension}`;
-        const { fileUpload, publicUrl } = await FirebaseRepo.uploadFile({
-            pathToSave,
-            file,
-        });
-        sendToQueue(
-            'student_changeAvatarUrl',
-            JSON.stringify({ avatar: publicUrl, header_role, header_uid, uid }),
-        );
-        return { publicUrl };
+        MqService.uploadAvatar({ avatar: file, uid });
+        return {};
     };
 }

@@ -26,6 +26,12 @@ export const coursesKey = {
     expireTimeInMinute: testTime || 60,
 };
 
+export const coursesKeyByKeyword = {
+    key: (page, resultPerPage, keyword) =>
+        `courses:${page}:${resultPerPage}:${keyword}`,
+    expireTimeInMinute: testTime || 60,
+};
+
 export const semesterKey = {
     key: (id) => `semester:${id}`,
     expireTimeInMinute: testTime || 60,

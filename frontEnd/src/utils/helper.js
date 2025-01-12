@@ -34,12 +34,11 @@ export const checkCredential = async () => {
     ) {
         console.log('Access token expired, trying to get a new one');
         try {
-            let response = await fetchGet(
-                authUrl,
-                'refreshAccessToken',
-                {},
-                true,
-            );
+            let response = await fetchGet({
+                base: authUrl,
+                path: 'refreshAccessToken',
+                cookies: true,
+            });
             console.log(response);
             if (response.metadata.accessToken) {
                 localStorage.setItem(

@@ -27,42 +27,8 @@
     margin: 1rem;
 }
 
-h1 {
-    text-align: center;
-    color: #1a1a1a;
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    font-weight: 500;
-}
-
 .form-group {
     margin-bottom: 1rem;
-}
-
-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #1a1a1a;
-    font-size: 1.5rem;
-}
-
-input {
-    width: 100%;
-    padding: 0.75rem;
-    border: none;
-    background-color: #f1f3f4;
-    border-radius: 4px;
-    font-size: 1.4rem;
-    transition: background-color 0.2s ease;
-}
-
-input:focus {
-    outline: none;
-    background-color: #e8eaed;
-}
-
-input::placeholder {
-    color: #70757a;
 }
 
 .submit-button {

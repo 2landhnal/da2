@@ -25,6 +25,14 @@ class EnrollmentController {
         }).send(res);
     };
 
+    syncInfor = async (req, res, next) => {
+        const metadata = await EnrollmentService.syncInfor();
+        new SuccessResponse({
+            message: 'Sync successfully!',
+            metadata,
+        }).send(res);
+    };
+
     getStudentInClass = async (req, res, next) => {
         const metadata = await EnrollmentService.getStudentInClass({
             header_role: req.header_role,

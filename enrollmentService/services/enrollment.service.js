@@ -20,6 +20,7 @@ import { AccountStatus } from '../utils/accountStatus.js';
 import { gRPCSemesterClient } from '../config/gRPC/semester.grpc.client.js';
 import { sendToQueue } from '../config/messageQueue/connect.js';
 import { gRPCCourseClient } from '../config/gRPC/course.grpc.client.js';
+import { gRPCTeacherClient } from '../config/gRPC/teacher.grpc.client.js';
 
 export const STUDENT_MAX_CREDIT = 24;
 
@@ -60,7 +61,7 @@ export class EnrollmentService {
         if (!_class) {
             throw new BadRequestError('Class not exist');
         }
-        const { semesterId, courseId } = _class;
+        const { semesterId, courseId, teacherId } = _class;
         // getCourse
         const { course } = (
             await gRPCCourseClient.getCourse({
@@ -78,6 +79,13 @@ export class EnrollmentService {
             throw new BadRequestError('Student not exist');
         }
         const { yoa, fullname: studentName, avatar: studentAvatar } = student;
+        // getTeacher => Teacher
+        const { teacher } = (
+            await gRPCTeacherClient.getTeacher({
+                infor: JSON.stringify({ uid: teacherId }),
+            })
+        ).metadata;
+        const { fullname: teacherName } = teacher;
         // check isStudentStatusOkay => from above
         if (student.accountStatus === AccountStatus.CLOSED) {
             throw new BadRequestError('Student inactive');
@@ -123,14 +131,43 @@ export class EnrollmentService {
             classId,
             semesterId,
             schedule,
+            courseId,
             courseCredit,
             courseName,
             studentName,
             studentAvatar,
+            teacherId,
+            teacherName,
         });
         // sync class enrollment
         sendToQueue('class_syncEnroll', JSON.stringify({ classId }));
         return { enrollment };
+    };
+
+    static syncInfor = async () => {
+        const enrolls = await EnrollmentRepo.queryEnrollment({ query: {} });
+        enrolls.forEach(async (enroll) => {
+            const { classId, studentId } = enroll;
+            // getClass => Class
+            const { _class } = (
+                await gRPCClassClient.getClass({
+                    infor: JSON.stringify({ classId }),
+                })
+            ).metadata;
+            if (!_class) {
+                throw new BadRequestError('Class not exist');
+            }
+            const { semesterId, courseId, teacherId, teacherName } = _class;
+
+            await EnrollmentRepo.updateEnrollment({
+                studentId,
+                classId,
+                courseId,
+                teacherId,
+                teacherName,
+            });
+        });
+        return {};
     };
 
     static search = async ({ page, resultPerPage, query, header_role }) => {
@@ -182,11 +219,11 @@ export class EnrollmentService {
         }
 
         // get from db
-        const courses = await EnrollmentRepo.getRegisteredClass({
+        const classes = await EnrollmentRepo.getRegisteredClass({
             studentId,
             semesterId,
         });
-        return courses;
+        return { classes };
     };
 
     static getNumberOfStudentInClass = async ({ classId, header_role }) => {

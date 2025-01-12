@@ -1,57 +1,114 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './Timetable.module.scss';
 import classNames from 'classnames/bind';
 import Tippy from '@tippyjs/react/headless';
 import 'tippy.js/dist/tippy.css'; // optional
 import SemesterBox from '../../components/SemesterBox';
+import { fetchGet } from '../../utils/fetch.utils.js';
+import {
+    classUrlSecure,
+    enrollmentUrl,
+    enrollmentUrlSecure,
+    semesterUrlSecure,
+} from '../../config/index.js';
+import { useAuth } from '../../routes/authProvider.route.js';
 
 const cx = classNames.bind(styles);
 
 function TimeTable() {
-    let semesterLst = [
-        {
-            title: 20221,
-        },
-        {
-            title: 20222,
-        },
-        {
-            title: 20223,
-        },
-    ];
-    semesterLst = semesterLst.map((e, index) => {
-        return {
-            ...e,
-            onClick: () => {
-                setSemester(semesterLst[index]);
-            },
+    const { payload } = useAuth();
+    const [semesterLst, setSemesterLst] = useState([]);
+    const [semester, setSemester] = useState(null);
+    const [_classes, setClasses] = useState([]);
+    const [_shifts, setShifts] = useState([]);
+    useEffect(() => {
+        const fun = async () => {
+            try {
+                const query = {
+                    query: JSON.stringify({}),
+                };
+                const { metadata } = await fetchGet({
+                    base: semesterUrlSecure,
+                    path: 'search',
+                    query: query,
+                });
+                console.log({ metadata });
+                let { semesters } = metadata;
+                semesters = semesters.map((e, index) => {
+                    return {
+                        ...e,
+                        title: e.id,
+                        onClick: () => {
+                            setSemester(semesters[index]);
+                        },
+                    };
+                });
+                console.log({ semesters });
+                setSemesterLst(semesters);
+                setSemester(semesters[0]);
+            } catch (error) {
+                console.log(error);
+            }
         };
-    });
-    const [semester, setSemester] = useState(semesterLst[0]);
-    // Sample data - this could be fetched from an API
-    const scheduleData = [
-        {
-            courseId: 'MI4414',
-            classId: '155371',
-            courseName: 'Quản trị dự án CNTT',
-            teacher: 'Lê Hải Hà',
-            time: 'Thứ 3,12h30 - 14h55',
-        },
-        {
-            courseId: 'MI4382',
-            classId: '155377',
-            courseName: 'Đồ họa máy tính',
-            teacher: 'Lê Kim Thư',
-            time: 'Thứ 5,12h30 - 15h50',
-        },
-        {
-            courseId: 'MI4374',
-            classId: '155377',
-            courseName: 'Thiết kế, cài đặt và quản trị mạng',
-            teacher: 'Nguyễn Đình Hân',
-            time: 'Thứ 5,16h0 - 17h30',
-        },
-    ];
+        fun();
+    }, []);
+
+    useEffect(() => {
+        const fun = async () => {
+            try {
+                if (!semester) return;
+                const { classes } = (
+                    await fetchGet({
+                        base: enrollmentUrlSecure,
+                        path: 'registered',
+                        query: {
+                            studentId: payload.uid,
+                            semesterId: semester.id,
+                        },
+                    })
+                ).metadata;
+                console.log(classes);
+
+                // shift
+                const query = {
+                    query: JSON.stringify({}),
+                };
+                const { metadata } = await fetchGet({
+                    base: classUrlSecure,
+                    path: '/shift/search',
+                    query: query,
+                });
+                let { shifts } = metadata;
+                console.log({ shifts });
+                setShifts(shifts);
+
+                const dict = shifts.reduce((acc, item) => {
+                    console.log({ item });
+                    const { startAt, endAt } = item;
+                    acc[item.id] = { startAt, endAt };
+                    return acc;
+                }, {});
+                console.log(dict);
+
+                setClasses(
+                    classes.map((e) => {
+                        let translatedSchedule = '';
+                        e.schedule.map((s) => {
+                            translatedSchedule += `Th${s.dayOfWeek}, từ ${
+                                dict[s.startShift].startAt
+                            } đến ${dict[s.endShift].endAt}\n`;
+                        });
+                        console.log(translatedSchedule);
+                        e.translatedSchedule = translatedSchedule;
+                        return e;
+                    }),
+                );
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fun();
+    }, [semester, payload]);
 
     return (
         <div className={cx('container')}>
@@ -72,15 +129,16 @@ function TimeTable() {
                         </tr>
                     </thead>
                     <tbody>
-                        {scheduleData.map((row, index) => (
-                            <tr key={index}>
-                                <td>{row.classId}</td>
-                                <td>{row.courseId}</td>
-                                <td>{row.courseName}</td>
-                                <td>{row.teacher}</td>
-                                <td>{row.time}</td>
-                            </tr>
-                        ))}
+                        {_classes.length > 0 &&
+                            _classes.map((_class, index) => (
+                                <tr key={index}>
+                                    <td>{_class?.classId || ''}</td>
+                                    <td>{_class?.courseId || ''}</td>
+                                    <td>{_class?.courseName || ''}</td>
+                                    <td>{_class?.teacherName || ''}</td>
+                                    <td>{_class?.translatedSchedule || ''}</td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>

@@ -2,13 +2,9 @@ import React, { useState } from 'react';
 import styles from './Auth.module.scss';
 import classNames from 'classnames/bind';
 import { useNavigate } from 'react-router-dom';
-import { authUrl } from '../../config';
+import { authUrl, authUrlSecure } from '../../config';
 import { routePath } from '../../routes';
-import {
-    fetchPost,
-    fetchPut,
-    optionWithAccessToken,
-} from '../../utils/fetch.utils';
+import { fetchPost, fetchPut } from '../../utils/fetch.utils';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -24,19 +20,13 @@ function ChangePassword() {
 
     const handleChangePassword = async () => {
         const { currentPassword, newPassword } = formData;
-        try {
-            const options = optionWithAccessToken({
-                otherHeaders: {
-                    'x-user-id': 20250000,
-                },
-            });
-            let response = await fetchPut(
-                authUrl,
-                '/changePassword',
-                JSON.stringify({ currentPassword, newPassword }),
-                options,
-                true,
-            );
+        const response = await fetchPut({
+            base: authUrlSecure,
+            path: '/changePassword',
+            body: { currentPassword, newPassword },
+            cookies: true,
+        });
+        if (response.ok) {
             console.log(response);
             toast.success('Change password success', { autoClose: 3000 });
             setFormData({
@@ -44,11 +34,11 @@ function ChangePassword() {
                 newPassword: '',
                 confirmPassword: '',
             });
-        } catch (error) {
-            toast.error(error.message || 'Invalid information', {
+        } else {
+            toast.error(response.message || 'Invalid information', {
                 autoClose: 3000,
             });
-            console.error(`Change password failed: ${error.message}`);
+            console.error(`Change password failed: ${response.message}`);
         }
     };
 

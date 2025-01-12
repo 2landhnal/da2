@@ -2,8 +2,8 @@
 import { requestHandler } from '../../helpers/requestHandler.js';
 import { TeacherRepo } from '../../models/repositories/teacher.repo.js';
 import { TmpRepo } from '../../models/repositories/tmp.repo.js';
-import { TeacherService } from '../../services/teacher.service.js';
 import { myConsume } from '../../helpers/mq.helper.js';
+import { HelpService } from '../../services/help.service.js';
 
 export async function setupConsumers(channel) {
     try {
@@ -43,7 +43,7 @@ export async function setupConsumers(channel) {
                 }
                 const buffer = TmpRepo.getFileBuferFromPath(msgObject);
                 const file = { buffer, ...msgObject };
-                await TeacherService.changeAvatar({ file, ...msgObject });
+                await HelpService.changeAvatar({ file, uid });
                 await TmpRepo.deleteFileAsync(msgObject);
             },
         });

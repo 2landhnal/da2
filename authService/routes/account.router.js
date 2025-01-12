@@ -2,7 +2,7 @@
 import express from 'express';
 import { authController } from '../controllers/auth.controller.js';
 import { asyncHandler } from '../helpers/asyncHandler.js';
-import { bdtRequired, authentication } from '../middlewares/auth.middleware.js';
+import { bdtRequired, authRequired } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
@@ -17,7 +17,11 @@ router.get(
 );
 
 // auth
-router.put('/changePassword', asyncHandler(authController.changePassword));
+router.put(
+    '/changePassword',
+    authRequired,
+    asyncHandler(authController.changePassword),
+);
 // bdt required
 router.post('/sync', bdtRequired, asyncHandler(authController.syncStatus));
 

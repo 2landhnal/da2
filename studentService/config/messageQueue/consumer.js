@@ -1,12 +1,15 @@
 'use strict';
-import { requestHandler } from '../../helpers/requestHandler.js';
 import {
     deleteStudentByUid,
     updateStudentStatus,
+    updateStudentInfor,
+    findStudentWithUid,
 } from '../../models/repositories/student.repo.js';
 import { TmpRepo } from '../../models/repositories/tmp.repo.js';
-import { StudentService } from '../../services/student.service.js';
 import { myConsume } from '../../helpers/mq.helper.js';
+import { HelpService } from '../../services/help.service.js';
+import { sendToQueue } from './connect.js';
+import { RoleCode } from '../../utils/roleCode.js';
 
 export async function setupConsumers(channel) {
     try {
@@ -29,7 +32,12 @@ export async function setupConsumers(channel) {
             channel,
             queue: 'student_changeAvatarUrl',
             callback: async ({ msgObject, queue }) => {
-                await StudentService.update({ ...msgObject });
+                const { uid, avatar } = msgObject;
+                await updateStudentInfor({ uid, avatar });
+                sendToQueue(
+                    'sync_infor',
+                    JSON.stringify({ role: RoleCode.STUDENT, uid, avatar }),
+                );
             },
         });
 
@@ -37,9 +45,17 @@ export async function setupConsumers(channel) {
             channel,
             queue: 'student_changeAvatar',
             callback: async ({ msgObject, queue }) => {
+                const { uid } = msgObject;
+                const student = await findStudentWithUid({ uid });
+                if (!student) {
+                    console.log(
+                        `[x] From consumer [${queue}]: Student with uid ${uid} not existed`,
+                    );
+                    return;
+                }
                 const buffer = TmpRepo.getFileBuferFromPath(msgObject);
                 const file = { buffer, ...msgObject };
-                await StudentService.changeAvatar({ file, ...msgObject });
+                await HelpService.changeAvatar({ file, uid });
                 await TmpRepo.deleteFileAsync(msgObject);
             },
         });

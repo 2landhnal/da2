@@ -15,6 +15,40 @@ export const createCourse = async ({ id, credit, ...others }) => {
     }
 };
 
+export const searchByKeyword = async ({ page, resultPerPage, keyword }) => {
+    try {
+        // Skip calculation for pagination
+        const skip = (page - 1) * resultPerPage;
+
+        // Parse the query string (e.g., "Coursername=abc") into a MongoDB query object
+        let queryArray = [
+            {
+                id: {
+                    $regex: keyword,
+                    $options: 'i',
+                },
+            },
+            {
+                name: {
+                    $regex: keyword,
+                    $options: 'i',
+                },
+            },
+        ];
+
+        // Execute query with pagination
+        const foundCourses = await Course.find({ $or: queryArray })
+            .skip(skip)
+            .limit(resultPerPage);
+
+        // Return paginated results and metadata
+        return foundCourses;
+    } catch (error) {
+        console.error('Error querying courses:', error);
+        throw error;
+    }
+};
+
 export const queryCourse = async ({ page, resultPerPage, query }) => {
     try {
         // Skip calculation for pagination
@@ -24,7 +58,9 @@ export const queryCourse = async ({ page, resultPerPage, query }) => {
         let queryObject = {};
         for (const field in query) {
             if (query[field]) {
-                if (typeof query[field] === 'string') {
+                if (query[field].$in && Array.isArray(query[field].$in)) {
+                    queryObject[field] = { $in: query[field].$in };
+                } else if (typeof query[field] === 'string') {
                     queryObject[field] = {
                         $regex: query[field],
                         $options: 'i',

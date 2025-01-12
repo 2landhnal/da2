@@ -137,6 +137,21 @@ export class EnrollmentRepo {
         }
     };
 
+    static updateEnrollment = async ({ classId, studentId, ...update }) => {
+        try {
+            const result = await Enrollment.updateOne(
+                { classId, studentId }, // Điều kiện lọc
+                { $set: update }, // Thay đổi cần áp dụng
+            );
+
+            console.log('Enrollment updated:', result);
+            return result; // Trả về kết quả cập nhật
+        } catch (error) {
+            console.error('Error updating enrollment:', error);
+            throw error;
+        }
+    };
+
     static getRegisteredClass = async ({ studentId, semesterId }) => {
         try {
             const founds = await Enrollment.find({ studentId, semesterId });

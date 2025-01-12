@@ -21,6 +21,13 @@ export const bctsvRequired = asyncHandler(async (req, res, next) => {
     }
     return next();
 });
+export const authRequired = asyncHandler(async (req, res, next) => {
+    if (req.header_role && req.header_uid) {
+        return next();
+    } else {
+        throw new AuthFailureError();
+    }
+});
 
 export const authentication = asyncHandler(async (req, res, next) => {
     // --------------------------------------------------

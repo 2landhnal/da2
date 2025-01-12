@@ -1,0 +1,10 @@
+FROM fabiocicerchia/nginx-lua
+
+RUN apk add --no-cache \
+    vim \
+    curl \
+    lsof
+
+COPY nginx.conf /etc/nginx/nginx.conf
+
+CMD ["nginx", "-g", "daemon off;"]

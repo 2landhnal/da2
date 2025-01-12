@@ -6,6 +6,7 @@ import { bdtRequired } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
+router.get('/search/keyword', asyncHandler(courseController.searchByKeyword));
 router.get('/search', asyncHandler(courseController.search));
 router.get('/:id', asyncHandler(courseController.findById));
 

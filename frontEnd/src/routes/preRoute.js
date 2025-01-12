@@ -10,32 +10,30 @@ function PreRoute(route) {
 
     useEffect(() => {
         const checkAuth = async () => {
-            const isAuthenticated = await checkCredential();
-            setAuth(isAuthenticated);
-
             const isPublicRoute = publicRoutes.some(
                 (r) => r.path === route.path,
             );
 
             // Nếu route là public
-            if (isPublicRoute && route.redirect && isAuthenticated) {
+            if (isPublicRoute && route.redirect && auth) {
                 navigate(route.redirect, { replace: true });
             }
             // Nếu route là private
             if (!isPublicRoute) {
-                if (!isAuthenticated)
-                    navigate(routePath.login, { replace: true });
+                if (!auth) navigate(routePath.login, { replace: true });
                 else if (
                     route.allowRoles &&
-                    !route.allowRoles.includes(payload.role)
+                    !route.allowRoles.includes(localStorage.getItem('role'))
                 ) {
+                    console.log('Redirect ', routePath.home);
                     navigate(routePath.home, { replace: true });
                 }
+                console.log('Stay ', route);
             }
         };
 
         checkAuth(); // Gọi hàm bất đồng bộ
-    }, [auth, navigate, route]);
+    }, [auth, navigate, route, payload]);
 
     if (auth === null) {
         // Có thể hiển thị trạng thái loading trong lúc chờ

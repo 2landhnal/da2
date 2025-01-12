@@ -1,120 +1,181 @@
+import { CONTENT_TYPE_VALUE } from '../config/header';
 import { joinUrl } from './helper';
 
 export const fetchAPI = async (url, options = {}) => {
-    let response = await fetch(url, options);
-
-    // Kiểm tra nếu response không thành công (status code >= 400)
-    if (!response.ok) {
+    try {
+        let response = await fetch(url, options);
+        const { ok } = response;
         response = await response.json();
-        const error = new Error(
-            response.message || `HTTP error! Status: ${response.status}`,
-        );
-        error.status = response.status; // Thêm status vào error
-        throw error;
+        return { ok, ...response };
+    } catch (error) {
+        console.log(error);
+        return { ok: false, message: error };
     }
-
-    // Nếu response có JSON, tự động parse
-    const contentType = response.headers.get('Content-Type');
-    if (contentType && contentType.includes('application/json')) {
-        return await response.json();
-    }
-
-    // Trả về response text nếu không phải JSON
-    return await response.text();
 };
 
-export const fetchGet = async (base, path, options = {}, cookies = false) => {
+export const fetchGet = async ({
+    base,
+    path,
+    options = {},
+    query = null,
+    token = true,
+    cookies = false,
+    contentType = CONTENT_TYPE_VALUE.default,
+}) => {
     try {
         options.headers = options.headers || {};
+        if (token) {
+            options.headers = {
+                ...options.headers,
+                authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            };
+        }
+        if (contentType) {
+            options.headers = {
+                ...options.headers,
+                'Content-Type': contentType,
+            };
+        }
+        if (token) {
+            options.headers = {
+                ...options.headers,
+                authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            };
+        }
+        if (query) {
+            path = path + '?' + new URLSearchParams(query);
+        }
+        console.log(path);
         const response = await fetchAPI(joinUrl(base, path), {
             method: 'GET',
             headers: {
                 ...options.headers,
-                'Content-Type': 'application/json', // Add this line
             },
             credentials: cookies ? 'include' : 'omit',
         });
         return response;
     } catch (error) {
         console.log(error);
-        throw error;
+        return { ok: false, message: error };
     }
 };
 
-export const fetchPost = async (
+export const fetchPost = async ({
     base,
     path,
     body = {},
     options = {},
+    token = true,
     cookies = false,
-) => {
+    contentType = CONTENT_TYPE_VALUE.default,
+}) => {
     try {
+        options.headers = options.headers || {};
+        if (token) {
+            options.headers = {
+                ...options.headers,
+                authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            };
+        }
+        if (contentType) {
+            options.headers = {
+                ...options.headers,
+                'Content-Type': contentType,
+            };
+        }
         const response = await fetchAPI(joinUrl(base, path), {
             method: 'POST',
             headers: {
                 ...options.headers,
-                'Content-Type': 'application/json', // Add this line
             },
-            body,
+            body: contentType ? JSON.stringify(body) : body,
             credentials: cookies ? 'include' : 'omit',
         });
         return response;
     } catch (error) {
-        console.error(`POST request failed: ${error}`);
-        throw error;
+        console.log(error);
+        return { ok: false, message: error };
     }
 };
 
-export const fetchPut = async (
+export const fetchPut = async ({
     base,
     path,
     body = {},
     options = {},
+    token = true,
     cookies = false,
-) => {
+    contentType = CONTENT_TYPE_VALUE.default,
+}) => {
     try {
+        options.headers = options.headers || {};
+        if (token) {
+            options.headers = {
+                ...options.headers,
+                authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            };
+        }
+        if (contentType) {
+            options.headers = {
+                ...options.headers,
+                'Content-Type': contentType,
+            };
+        }
         const response = await fetchAPI(joinUrl(base, path), {
             method: 'PUT',
             headers: {
                 ...options.headers,
-                'Content-Type': 'application/json', // Add this line
             },
-            body,
+            body: contentType ? JSON.stringify(body) : body,
             credentials: cookies ? 'include' : 'omit',
         });
         return response;
     } catch (error) {
-        console.error(`PUT request failed: ${error}`);
-        throw error;
+        console.log(error);
+        return { ok: false, message: error };
     }
 };
 
-export const fetchDelete = async (
+export const fetchDelete = async ({
     base,
     path,
     options = {},
+    token = true,
     cookies = false,
-) => {
+    contentType = CONTENT_TYPE_VALUE.default,
+}) => {
     try {
+        options.headers = options.headers || {};
+        if (token) {
+            options.headers = {
+                ...options.headers,
+                authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            };
+        }
+        if (contentType) {
+            options.headers = {
+                ...options.headers,
+                'Content-Type': contentType,
+            };
+        }
         const response = await fetchAPI(joinUrl(base, path), {
             method: 'DELETE',
             headers: {
                 ...options.headers,
-                'Content-Type': 'application/json', // Add this line
             },
             credentials: cookies ? 'include' : 'omit',
         });
         return response;
     } catch (error) {
-        console.error(`DELETE request failed: ${error}`);
-        throw error;
+        console.log(error);
+        return { ok: false, message: error };
     }
 };
 
-export const optionWithAccessToken = ({
+const optionWithAccessToken = ({
     otherHeaders = {},
     otherOptions = {},
-}) => {
+} = {}) => {
     return {
         ...otherOptions,
         headers: {

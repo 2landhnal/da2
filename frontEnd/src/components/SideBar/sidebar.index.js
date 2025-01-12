@@ -12,14 +12,14 @@ const cx = classNames.bind(styles);
 function Sidebar() {
     const navigate = useNavigate();
     const handleLogout = async () => {
-        await fetchDelete(authUrl, 'logout', {}, true);
+        await fetchDelete({ base: authUrl, path: 'logout', cookies: true });
         localStorage.removeItem('accessToken');
         navigate(routePath.login);
     };
     const sidebarItems = [
-        { name: 'Thông báo', href: routePath.home },
+        { name: 'Thông báo', href: '#' },
         { name: 'Đổi mật khẩu', href: routePath.changePassword },
-        { name: 'Cập nhật thông tin', href: '#' },
+        { name: 'Cập nhật thông tin', href: routePath.updateInformation },
         { name: 'Thời khóa biểu', href: routePath.timeTable },
         { name: 'Kế hoạch học tập', href: '#' },
         { name: 'Đăng xuất', onClick: handleLogout },

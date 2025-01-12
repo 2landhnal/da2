@@ -11,6 +11,10 @@ import Timetable from '../pages/Timetable';
 import Enroll from '../pages/Enroll';
 import Course from '../pages/Course';
 import { RoleCode } from '../config/roleCode';
+import UpdateInfor from '../pages/UpdateInformation';
+import OpenCourses from '../pages/Course/openCourses';
+import AddCourse from '../pages/AdminCourse';
+import UpdateCourse from '../pages/AdminCourse/edit';
 
 export const routePath = {
     login: '/login',
@@ -25,6 +29,10 @@ export const routePath = {
     timeTable: '/timeTable',
     newClass: '/newClass',
     registrationSchedule: '/registrationSchedule',
+    updateInformation: '/updateInformation',
+    openCourses: '/course/open',
+    updateCourse: '/course/update/:id',
+    addCourse: '/course/add',
 };
 
 export const publicRoutes = [
@@ -37,14 +45,26 @@ export const publicRoutes = [
     { path: routePath.error, component: Error, layout: null },
     { path: routePath.home, component: Home, layout: HeaderOnly },
     { path: routePath.course, component: Course },
+    { path: routePath.openCourses, component: OpenCourses },
 ];
 export const privateRoutes = [
     { path: routePath.registration, component: Registration },
+    { path: routePath.updateInformation, component: UpdateInfor },
     { path: routePath.semester, component: Semester },
     {
         path: routePath.user,
         component: User,
         allowRoles: [RoleCode.STUDENT, RoleCode.TEACHER],
+    },
+    {
+        path: routePath.addCourse,
+        component: AddCourse,
+        allowRoles: [RoleCode.BDT],
+    },
+    {
+        path: routePath.updateCourse,
+        component: UpdateCourse,
+        allowRoles: [RoleCode.BDT],
     },
     { path: routePath.changePassword, component: ChangePassword },
     { path: routePath.enroll, component: Enroll },

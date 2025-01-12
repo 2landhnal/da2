@@ -120,6 +120,35 @@ export class ClassService {
         return { class: _class };
     };
 
+    static syncInfor = async () => {
+        const classes = await ClassRepo.queryClass({ query: {} });
+        classes.forEach(async (_class) => {
+            const { teacherId, id: classId } = _class;
+            let infor;
+            // check isTeacherActive
+            infor = JSON.stringify({ uid: teacherId });
+            if (
+                !(await gRPCTeacherClient.isTeacherActive({ infor })).metadata
+                    .active
+            ) {
+                throw new BadRequestError('Teacher not available');
+            }
+            const teacher = (await gRPCTeacherClient.getTeacher({ infor }))
+                .metadata.teacher;
+            infor = JSON.stringify({ id: _class.courseId });
+            const course = (await gRPCCourseClient.getCourse({ infor }))
+                .metadata.course;
+
+            await ClassRepo.updateClassInfor({
+                id: classId,
+                teacherName: teacher.fullname,
+                teacherId,
+                courseId: course.id,
+            });
+        });
+        return {};
+    };
+
     static search = async ({ page, resultPerPage, query }) => {
         // validate
         page = Number(page) || 1;

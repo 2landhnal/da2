@@ -10,11 +10,16 @@ import {
     findCourseWithId,
     queryCourse,
     closeCourseById,
+    searchByKeyword,
 } from '../models/repositories/course.repo.js';
 import { getInfoData } from '../utils/index.js';
 import { RoleCode } from '../utils/roleCode.js';
 import { tryGetFromCache } from '../helpers/redis.helper.js';
-import { courseKey, coursesKey } from '../config/redis/redis.config.js';
+import {
+    courseKey,
+    coursesKey,
+    coursesKeyByKeyword,
+} from '../config/redis/redis.config.js';
 
 export class CourseService {
     static create = async ({ id, credit, ...infor }) => {
@@ -35,12 +40,11 @@ export class CourseService {
         return { course };
     };
 
-    static search = async ({ page, resultPerPage, query }) => {
+    static query = async ({ page, resultPerPage, query }) => {
         // validate
         page = Number(page) || 1;
         resultPerPage = Number(resultPerPage) || 10;
         query = JSON.parse(query);
-        console.log(query);
 
         // query
         let courses;
@@ -49,6 +53,30 @@ export class CourseService {
             coursesKey.expireTimeInMinute,
             async () => {
                 return await queryCourse({ page, resultPerPage, query });
+            },
+        );
+
+        return {
+            courses,
+            pagination: {
+                page,
+                resultPerPage,
+                totalResults: courses.length,
+            },
+        };
+    };
+
+    static search = async ({ page, resultPerPage, keyword }) => {
+        // validate
+        page = Number(page) || 1;
+        resultPerPage = Number(resultPerPage) || 10;
+
+        // query
+        const courses = await tryGetFromCache(
+            coursesKeyByKeyword.key(page, resultPerPage, keyword),
+            coursesKeyByKeyword.expireTimeInMinute,
+            async () => {
+                return await searchByKeyword({ page, resultPerPage, keyword });
             },
         );
 

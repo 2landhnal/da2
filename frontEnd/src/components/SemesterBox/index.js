@@ -7,7 +7,7 @@ const cx = classNames.bind(styles);
 function SemesterBox({ semesterLst, semester }) {
     return (
         <DropDown items={semesterLst}>
-            <span className={cx('semester')}>{semester.title}</span>
+            <span className={cx('semester')}>{semester?.title || '00000'}</span>
         </DropDown>
     );
 }

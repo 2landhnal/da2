@@ -10,6 +10,14 @@ class CourseController {
     };
 
     search = async (req, res, next) => {
+        const metadata = await CourseService.query(req.query);
+        new SuccessResponse({
+            message: 'Search successfully!',
+            metadata,
+        }).send(res);
+    };
+
+    searchByKeyword = async (req, res, next) => {
         const metadata = await CourseService.search(req.query);
         new SuccessResponse({
             message: 'Search successfully!',

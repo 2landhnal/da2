@@ -19,7 +19,11 @@ router.get(
     '/usedCredit',
     asyncHandler(enrollmentController.getStudentCurrentUsedCredit),
 );
-router.get('/', asyncHandler(enrollmentController.getRegisteredClasses));
+router.get(
+    '/registered',
+    asyncHandler(enrollmentController.getRegisteredClasses),
+);
+router.put('/sync', bdtRequired, asyncHandler(enrollmentController.syncInfor));
 router.post('/', asyncHandler(enrollmentController.create));
 router.put('/delete', asyncHandler(enrollmentController.delete));
 

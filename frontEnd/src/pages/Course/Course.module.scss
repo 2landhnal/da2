@@ -4,6 +4,19 @@
     margin: 0 auto;
 }
 
+// Header section
+.headerSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: normal;
+}
+
 /* Search Section */
 .searchContainer {
     display: flex;
@@ -19,7 +32,7 @@
     padding: 0.5rem;
     border: none;
     border-radius: 2px;
-    font-size: 1rem;
+    font-size: 1.6rem;
 }
 
 .searchInput:focus {
@@ -44,6 +57,32 @@
 .tableContainer {
     width: 100%;
     overflow-x: auto;
+    position: relative;
+}
+
+// page number
+.page-number-container {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 110px;
+    height: 32px;
+    display: flex;
+}
+
+.page-number-arrow-btn {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.page-number-input {
+    width: 100%;
+    height: 100%;
+    -webkit-appearance: none;
+    margin: 0 5px;
+    text-align: center;
 }
 
 .table {

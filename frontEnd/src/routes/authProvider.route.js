@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
     const location = useLocation(); // Lấy thông tin URL hiện tại
 
     useEffect(() => {
+        console.log('Auth provider check token');
         const checkAuth = async () => {
             const isAuthenticated = await checkCredential();
             setAuth(isAuthenticated);
@@ -18,13 +19,15 @@ export const AuthProvider = ({ children }) => {
             const accessToken = localStorage.getItem('accessToken');
             if (accessToken) {
                 const decoded = jwtDecode(accessToken);
-                console.log(decoded);
                 setPayload(decoded);
+                localStorage.setItem('role', decoded.role);
+            } else {
+                setAuth(false);
             }
         };
 
         checkAuth();
-    }, [location.pathname]); // Chạy lại khi URL thay đổi
+    }, [location.pathname]);
 
     return (
         <AuthContext.Provider value={{ auth, setAuth, payload }}>

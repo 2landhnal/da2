@@ -17,6 +17,14 @@ export class ClassController {
         }).send(res);
     };
 
+    static syncInfor = async (req, res, next) => {
+        const metadata = await ClassService.syncInfor();
+        new SuccessResponse({
+            message: 'Sync successfully!',
+            metadata,
+        }).send(res);
+    };
+
     static findById = async (req, res, next) => {
         const metadata = await ClassService.findById(req.params);
         new SuccessResponse({
