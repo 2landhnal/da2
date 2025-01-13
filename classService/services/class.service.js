@@ -157,8 +157,8 @@ export class ClassService {
         console.log(query);
 
         // query
-        let classs;
-        classs = await tryGetFromCache(
+        let classes;
+        classes = await tryGetFromCache(
             classesKey.key(page, resultPerPage, query),
             classesKey.expireTimeInMinute,
             async () => {
@@ -171,11 +171,11 @@ export class ClassService {
         );
 
         return {
-            classs,
+            classes,
             pagination: {
                 page,
                 resultPerPage,
-                totalResults: classs.length,
+                totalResults: classes.length,
             },
         };
     };

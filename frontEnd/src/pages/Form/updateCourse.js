@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from './Course.module.scss';
+import styles from './Form.module.scss';
 import classNames from 'classnames/bind';
 import { authUrl, courseUrl, courseUrlSecure } from '../../config';
 import { routePath } from '../../routes';
@@ -79,7 +79,7 @@ function UpdateCourse() {
     return (
         <div className={cx('container')}>
             <div className={cx('card')}>
-                <h1>Cập nhậtgit học phần</h1>
+                <h1>Cập nhật học phần</h1>
 
                 <form onSubmit={handleSubmit}>
                     <div className={cx('form-group')}>

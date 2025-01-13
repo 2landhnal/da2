@@ -1,5 +1,5 @@
 function Semester() {
-    return <h2>Semester</h2>;
+    return <div>Semester</div>;
 }
 
 export default Semester;

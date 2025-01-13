@@ -7,7 +7,7 @@ const { setupRateLimit } = require('./ratelimit');
 const { setupProxies } = require('./proxy');
 
 const app = express();
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+app.use(cors({ credentials: true, origin: true }));
 const port = process.env.port || 8080;
 
 setupLogging(app);

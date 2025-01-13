@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from './Course.module.scss';
+import styles from './Query.module.scss';
 import classNames from 'classnames/bind';
 import { useEffect } from 'react';
 import { fetchGet } from '../../utils/fetch.utils';
@@ -8,13 +8,42 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faChevronLeft,
     faChevronRight,
+    faChevronDown,
 } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { routePath } from '../../routes';
+import { RoleCode } from '../../config/roleCode';
+import { useAuth } from '../../routes/authProvider.route';
+import DropDown from '../../components/DropDown';
 
 const cx = classNames.bind(styles);
 
 function CourseSearch() {
+    const filters = [
+        {
+            title: 'ID',
+            code: 'id',
+            onClick: () => {
+                setFilter(filters[0]);
+            },
+        },
+        {
+            title: 'Tên học phần',
+            code: 'name',
+            onClick: () => {
+                setFilter(filters[1]);
+            },
+        },
+        {
+            title: 'Tín chỉ',
+            code: 'credit',
+            onClick: () => {
+                setFilter(filters[2]);
+            },
+        },
+    ];
+    const [filter, setFilter] = useState(filters[0]);
+    const { payload } = useAuth();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [tmp, setTmp] = useState('');
@@ -28,12 +57,12 @@ function CourseSearch() {
                 const query = {
                     page,
                     resultPerPage: 50,
-                    keyword: searchTerm,
+                    query: JSON.stringify({ [filter.code]: searchTerm }),
                 };
                 const { courses: _courses } = (
                     await fetchGet({
                         base: courseUrl,
-                        path: '/search/keyword',
+                        path: '/search',
                         query,
                     })
                 ).metadata;
@@ -44,7 +73,7 @@ function CourseSearch() {
             }
         };
         fun();
-    }, [searchTerm, page]);
+    }, [searchTerm, page, filter]);
 
     // // Sample course data
     // const courses = [
@@ -61,9 +90,17 @@ function CourseSearch() {
 
         // Set a new timeout
         const timeout = setTimeout(() => {
-            setSearchTerm(tmp); // Update search term after 200ms
+            setSearchTerm(value); // Update search term after 200ms
         }, 200);
         setDebounceTimeout(timeout);
+    };
+
+    const handleRowOnClick = (course) => {
+        if (payload && payload.role === RoleCode.BDT) {
+            navigate(routePath.updateCourse.split(':')[0] + `${course.id}`, {
+                replace: true,
+            });
+        }
     };
 
     return (
@@ -77,11 +114,25 @@ function CourseSearch() {
                     placeholder="Môn học"
                     className={cx('searchInput')}
                 />
-                <button className={cx('searchButton')}>Search</button>
+                <DropDown items={filters}>
+                    <button className={cx('searchButton')}>
+                        {filter.title}
+                        <FontAwesomeIcon icon={faChevronDown} />
+                    </button>
+                </DropDown>
             </div>
 
-            {/* Results Table */}
-            <div className={cx('tableContainer')}>
+            <div className={cx('secondRow')}>
+                {payload && payload.role === RoleCode.BDT && (
+                    <button
+                        className={cx('add-button')}
+                        onClick={() => {
+                            navigate(routePath.addCourse, { replace: true });
+                        }}
+                    >
+                        Thêm mới
+                    </button>
+                )}
                 <div className={cx('page-number-container')}>
                     <div
                         className={cx('page-number-arrow-btn')}
@@ -108,6 +159,10 @@ function CourseSearch() {
                         <FontAwesomeIcon icon={faChevronRight} />
                     </div>
                 </div>
+            </div>
+
+            {/* Results Table */}
+            <div className={cx('tableContainer')}>
                 <table className={cx('table')}>
                     <thead>
                         <tr>
@@ -120,13 +175,7 @@ function CourseSearch() {
                         {courses.map((course, index) => (
                             <tr
                                 key={index}
-                                onClick={() => {
-                                    navigate(
-                                        routePath.updateCourse.split(':')[0] +
-                                            `${course.id}`,
-                                        { replace: true },
-                                    );
-                                }}
+                                onClick={() => handleRowOnClick(course)}
                             >
                                 <td>{course.id}</td>
                                 <td>{course.name}</td>

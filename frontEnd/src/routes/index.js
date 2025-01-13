@@ -6,15 +6,20 @@ import { HeaderOnly } from '../layouts';
 import Registration from '../pages/Registration';
 import Semester from '../pages/Semester';
 import RegistrationSchedule from '../pages/RegistrationSchedule';
-import AddClass from '../pages/AddClass';
 import Timetable from '../pages/Timetable';
 import Enroll from '../pages/Enroll';
-import Course from '../pages/Course';
+import Course from '../pages/Query/course';
 import { RoleCode } from '../config/roleCode';
 import UpdateInfor from '../pages/UpdateInformation';
-import OpenCourses from '../pages/Course/openCourses';
-import AddCourse from '../pages/AdminCourse';
-import UpdateCourse from '../pages/AdminCourse/edit';
+import OpenCourses from '../pages/Query/openCourses';
+import AddCourse from '../pages/Form/addCourse';
+import UpdateCourse from '../pages/Form/updateCourse';
+import Room from '../pages/Query/room';
+import UpdateRoom from '../pages/Form/updateRoom.js';
+import AddRoom from '../pages/Form/addRoom.js';
+import Classs from '../pages/Query/class';
+import UpdateClass from '../pages/Form/updateClass.js';
+import AddClass from '../pages/Form/addClass.js';
 
 export const routePath = {
     login: '/login',
@@ -23,7 +28,6 @@ export const routePath = {
     home: '/',
     error: '/error',
     registration: '/registration',
-    semester: '/semester',
     course: '/course',
     enroll: '/enroll',
     timeTable: '/timeTable',
@@ -33,6 +37,15 @@ export const routePath = {
     openCourses: '/course/open',
     updateCourse: '/course/update/:id',
     addCourse: '/course/add',
+    room: '/room',
+    addRoom: '/room/add',
+    updateRoom: '/room/update/:id',
+    semester: '/semester',
+    addSemester: '/semester/add',
+    updateSemester: '/semester/update/:id',
+    class: '/class',
+    addClass: '/class/add',
+    updateClass: '/class/update/:id',
 };
 
 export const publicRoutes = [
@@ -49,8 +62,13 @@ export const publicRoutes = [
 ];
 export const privateRoutes = [
     { path: routePath.registration, component: Registration },
+    { path: routePath.room, component: Room, allowRoles: [RoleCode.BCSVC] },
     { path: routePath.updateInformation, component: UpdateInfor },
-    { path: routePath.semester, component: Semester },
+    {
+        path: routePath.semester,
+        component: Semester,
+        allowRoles: [RoleCode.BDT],
+    },
     {
         path: routePath.user,
         component: User,
@@ -64,6 +82,31 @@ export const privateRoutes = [
     {
         path: routePath.updateCourse,
         component: UpdateCourse,
+        allowRoles: [RoleCode.BDT],
+    },
+    {
+        path: routePath.addRoom,
+        component: AddRoom,
+        allowRoles: [RoleCode.BCSVC],
+    },
+    {
+        path: routePath.updateRoom,
+        component: UpdateRoom,
+        allowRoles: [RoleCode.BCSVC],
+    },
+    {
+        path: routePath.class,
+        component: Classs,
+        allowRoles: [RoleCode.BDT],
+    },
+    {
+        path: routePath.addClass,
+        component: AddClass,
+        allowRoles: [RoleCode.BDT],
+    },
+    {
+        path: routePath.updateClass,
+        component: UpdateClass,
         allowRoles: [RoleCode.BDT],
     },
     { path: routePath.changePassword, component: ChangePassword },

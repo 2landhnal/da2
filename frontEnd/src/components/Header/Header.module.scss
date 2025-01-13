@@ -24,7 +24,7 @@
 .logo a {
     color: white;
     text-decoration: none;
-    font-size: 2.5rem;
+    font-size: 3rem;
     font-weight: bold;
 }
 
@@ -35,15 +35,18 @@
     margin-bottom: 0;
 }
 
+.mainNav ul li {
+    border-bottom: 2px solid rgba(0, 0, 255, 0);
+}
+
+.mainNav ul li:hover {
+    border-bottom: 2px solid rgb(255, 255, 255);
+}
+
 .mainNav a {
     color: white;
     text-decoration: none;
     padding: 0.5rem;
-}
-
-.mainNav a:hover {
-    background-color: #4a4a4a;
-    border-radius: 4px;
 }
 
 @media (max-width: 768px) {

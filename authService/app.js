@@ -16,7 +16,7 @@ import { init } from './config/gRPC/auth.grpc.server.js';
 
 const app = express();
 
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+app.use(cors({ credentials: true, origin: true }));
 app.use(cookieParser());
 app.use(compression());
 app.use(express.json());

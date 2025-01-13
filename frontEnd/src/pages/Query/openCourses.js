@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from './Course.module.scss';
+import styles from './Query.module.scss';
 import classNames from 'classnames/bind';
 import SemesterBox from '../../components/SemesterBox';
 import { useEffect } from 'react';

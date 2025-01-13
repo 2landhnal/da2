@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from './Course.module.scss';
+import styles from './Form.module.scss';
 import classNames from 'classnames/bind';
 import { authUrl, courseUrlSecure, studentUrlSecure } from '../../config';
 import { routePath } from '../../routes';
@@ -103,8 +103,8 @@ function AddCourse() {
                         />
                     </div>
 
-                    <button type="submit" className={cx('submit-button')}>
-                        Update
+                    <button type="submit" className={cx('button')}>
+                        Thêm học phần
                     </button>
                 </form>
             </div>

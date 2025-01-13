@@ -73,6 +73,8 @@ export class RoomService {
     };
 
     static update = async ({ id, maxCapacity, status }) => {
+        let room = await RoomRepo.findRoomById({ id });
+        maxCapacity = maxCapacity || room.maxCapacity;
         // validate
         const { error, value } = RoomValidate.roomSchema.validate({
             id,
@@ -82,7 +84,7 @@ export class RoomService {
             throw new BadRequestError(error.details[0].message);
         }
 
-        let room = await RoomRepo.updateRoomInfor({ id, maxCapacity, status });
+        room = await RoomRepo.updateRoomInfor({ id, maxCapacity, status });
 
         return { room };
     };

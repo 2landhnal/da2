@@ -23,9 +23,15 @@ function DropDown({
             delay={[0, 100]}
             placement="bottom"
             onHide={onHide}
-            render={(attrs) => (
-                <div className={cx('itemWrapper')}>{getRenderItems(items)}</div>
-            )}
+            render={
+                items.length > 0
+                    ? (attrs) => (
+                          <div className={cx('itemWrapper')}>
+                              {getRenderItems(items)}
+                          </div>
+                      )
+                    : () => <div></div>
+            }
         >
             {children}
         </Tippy>
