@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logger
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logger
+  template:
+    metadata:
+      labels:
+        app: logger
+    spec:
+      containers:
+        - name: logger
+          image: 2land/logger:da2_v6
+          ports:
+            - containerPort: 8080 # Cổng ứng dụng Node.js
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logger-service
+spec:
+  selector:
+    app: logger
+  ports:
+    - protocol: TCP
+      port: 80 # Cổng service expose
+      targetPort: 8080 # Cổng trong container ứng dụng
+  type: ClusterIP # Bạn có thể đổi thành LoadBalancer hoặc NodePort tùy vào yêu cầu
