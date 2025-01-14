@@ -43,7 +43,11 @@ function OpenCourses() {
                 });
                 console.log({ semesters });
                 setSemesterLst(semesters);
-                setSemester(semesters[0]);
+                semesters.forEach((s) => {
+                    if (s.status === 'active') {
+                        setSemester(s);
+                    }
+                });
             } catch (error) {
                 console.log(error);
             }

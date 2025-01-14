@@ -1,12 +1,63 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './Enroll.module.scss';
 import classNames from 'classnames/bind';
+import SemesterBox from '../../components/SemesterBox';
+import { fetchGet } from '../../utils/fetch.utils';
+import { semesterUrl, semesterUrlSecure } from '../../config';
 
 const cx = classNames.bind(styles);
 
 function Enroll() {
     const [classId, setClassId] = useState('');
     const [showError, setShowError] = useState(true);
+    const [semesterLst, setSemesterLst] = useState([]);
+    const [semester, setSemester] = useState(null);
+
+    useEffect(() => {
+        const fun = async () => {
+            try {
+                const query = {
+                    query: JSON.stringify({}),
+                };
+                const { metadata } = await fetchGet({
+                    base: semesterUrlSecure,
+                    path: 'search',
+                    query: query,
+                });
+                console.log({ metadata });
+                let { semesters } = metadata;
+                semesters = semesters.map((e, index) => {
+                    return {
+                        ...e,
+                        title: e.id,
+                        onClick: () => {
+                            setSemester(semesters[index]);
+                        },
+                    };
+                });
+                console.log({ semesters });
+                setSemesterLst(semesters);
+                semesters.forEach((s) => {
+                    if (s.status === 'processing') {
+                        setSemester(s);
+                    }
+                });
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fun();
+    }, []);
+
+    useEffect(() => {
+        const fun = () => {
+            try {
+                // const {classes}
+            } catch (error) {
+                console.log(error);
+            }
+        };
+    }, [semester]);
 
     // State for registered classes
     const [registeredClasses, setRegisteredClasses] = useState([
@@ -38,6 +89,10 @@ function Enroll() {
 
     return (
         <div className={cx('container')}>
+            <div className={cx('headerSection')}>
+                <h1 className={cx('title')}>Kì học</h1>
+                <SemesterBox semesterLst={semesterLst} semester={semester} />
+            </div>
             {/* Enrollment Form */}
             <form onSubmit={handleSubmit} className={cx('enrollForm')}>
                 <div className={cx('formGroup')}>
@@ -54,10 +109,10 @@ function Enroll() {
                 </div>
             </form>
 
-            {/* Error Message */}
+            {/* Error Message
             {showError && (
                 <div className={cx('errorMessage')}>Lớp học 165389 đã đầy</div>
-            )}
+            )} */}
 
             {/* Registered Classes */}
             <div className={cx('registeredSection')}>

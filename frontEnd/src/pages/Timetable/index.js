@@ -45,7 +45,11 @@ function TimeTable() {
                 });
                 console.log({ semesters });
                 setSemesterLst(semesters);
-                setSemester(semesters[0]);
+                semesters.forEach((s) => {
+                    if (s.status === 'active') {
+                        setSemester(s);
+                    }
+                });
             } catch (error) {
                 console.log(error);
             }
@@ -113,7 +117,7 @@ function TimeTable() {
     return (
         <div className={cx('container')}>
             <div className={cx('headerSection')}>
-                <h1 className={cx('title')}>Time table</h1>
+                <h1 className={cx('title')}>Thời khóa biểu</h1>
                 <SemesterBox semesterLst={semesterLst} semester={semester} />
             </div>
 
