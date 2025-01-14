@@ -131,7 +131,7 @@ function UpdateClass() {
     return (
         <div className={cx('container')}>
             <div className={cx('card')}>
-                <h1>Thêm lớp học</h1>
+                <h1>Cập nhật lớp học</h1>
 
                 <form onSubmit={handleSubmit}>
                     <div className={cx('form-group')}>

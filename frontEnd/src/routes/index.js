@@ -4,7 +4,6 @@ import Home from '../pages/Home';
 import Error from '../pages/Error';
 import { HeaderOnly } from '../layouts';
 import Registration from '../pages/Registration';
-import Semester from '../pages/Semester';
 import RegistrationSchedule from '../pages/RegistrationSchedule';
 import Timetable from '../pages/Timetable';
 import Enroll from '../pages/Enroll';
@@ -17,9 +16,12 @@ import UpdateCourse from '../pages/Form/updateCourse';
 import Room from '../pages/Query/room';
 import UpdateRoom from '../pages/Form/updateRoom.js';
 import AddRoom from '../pages/Form/addRoom.js';
-import Classs from '../pages/Query/class';
+import Class from '../pages/Query/class';
 import UpdateClass from '../pages/Form/updateClass.js';
 import AddClass from '../pages/Form/addClass.js';
+import Semester from '../pages/Query/semester.js';
+import UpdateSemester from '../pages/Form/updateSemester.js';
+import AddSemester from '../pages/Form/addSemester.js';
 
 export const routePath = {
     login: '/login',
@@ -96,7 +98,7 @@ export const privateRoutes = [
     },
     {
         path: routePath.class,
-        component: Classs,
+        component: Class,
         allowRoles: [RoleCode.BDT],
     },
     {
@@ -107,6 +109,21 @@ export const privateRoutes = [
     {
         path: routePath.updateClass,
         component: UpdateClass,
+        allowRoles: [RoleCode.BDT],
+    },
+    {
+        path: routePath.semester,
+        component: Semester,
+        allowRoles: [RoleCode.BDT],
+    },
+    {
+        path: routePath.addSemester,
+        component: AddSemester,
+        allowRoles: [RoleCode.BDT],
+    },
+    {
+        path: routePath.updateSemester,
+        component: UpdateSemester,
         allowRoles: [RoleCode.BDT],
     },
     { path: routePath.changePassword, component: ChangePassword },

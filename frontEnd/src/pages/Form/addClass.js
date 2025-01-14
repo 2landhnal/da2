@@ -224,17 +224,20 @@ function AddClass() {
                     {/* Quản lý danh sách lịch học */}
                     <div className={cx('form-group')}>
                         <div className="flexRow">
-                            <label>Lịch học </label>
-                            <FontAwesomeIcon
-                                icon={faPlusCircle}
-                                onClick={addSchedule}
-                                className={cx('add-schedule')}
-                            />
+                            <label>
+                                Lịch học{' '}
+                                <FontAwesomeIcon
+                                    icon={faPlusCircle}
+                                    onClick={addSchedule}
+                                    className={cx('add-circle')}
+                                />
+                            </label>
                         </div>
                         {formData.schedule.map((schedule, index) => (
                             <div key={index} className={cx('schedule-item')}>
                                 <select
                                     value={schedule.startShift}
+                                    title="Hehe"
                                     onChange={(e) =>
                                         handleScheduleChange(
                                             index,
@@ -257,6 +260,7 @@ function AddClass() {
                                 </select>
                                 <select
                                     value={schedule.endShift}
+                                    title="Hehe"
                                     onChange={(e) =>
                                         handleScheduleChange(
                                             index,
@@ -286,6 +290,7 @@ function AddClass() {
                                             e.target.value,
                                         )
                                     }
+                                    title="Hehe"
                                     required
                                 >
                                     <option value={0}>Chọn ngày</option>

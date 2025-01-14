@@ -80,13 +80,6 @@ function Header() {
             },
         },
         {
-            name: 'Lịch đăng ký',
-            href: routePath.search,
-            allow: (auth, role) => {
-                return [RoleCode.BDT].includes(role);
-            },
-        },
-        {
             name: 'Quản lý sinh viên',
             href: routePath.search,
             allow: (auth, role) => {

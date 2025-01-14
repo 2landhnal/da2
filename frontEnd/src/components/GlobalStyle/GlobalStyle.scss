@@ -31,21 +31,24 @@ h1 {
     font-weight: 500;
 }
 label {
-    display: block;
+    display: flex;
     color: #1a1a1a;
     font-size: 1.5rem;
+    margin-bottom: 5px;
 }
 
 input,
 select {
     width: 100%;
     padding: 0.75rem;
-    border: none;
-    background-color: #f1f3f4;
+    background-color: hsl(0, 0%, 100%);
+    border-color: hsl(0, 0%, 80%);
     border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
     font-size: 1.4rem;
     transition: background-color 0.2s ease;
-    margin: 2px 0;
+    margin-bottom: 5px;
 }
 
 input:focus {
@@ -60,8 +63,7 @@ input::-webkit-inner-spin-button {
     margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 
-input:read-only,
-select:read-only {
+input:read-only {
     background-color: #e9ecef; /* Màu nền khác biệt */
     color: #6c757d; /* Màu chữ nhạt */
     cursor: not-allowed; /* Hiển thị icon cấm */
@@ -114,4 +116,8 @@ a {
 .flexRow {
     display: flex;
     align-items: center;
+}
+
+.spacer {
+    margin-bottom: 2rem;
 }

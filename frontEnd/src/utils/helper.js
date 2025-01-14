@@ -24,6 +24,21 @@ export const isTokenExpired = (token) => {
     }
 };
 
+export const getAccessTokenExpiredTime = () => {
+    try {
+        const remain =
+            -Date.now() +
+            JSON.parse(atob(localStorage.getItem('accessToken').split('.')[1]))
+                .exp *
+                1000;
+        console.log({ remain });
+        return remain;
+    } catch (error) {
+        console.log(error);
+        return 0;
+    }
+};
+
 export const checkCredential = async () => {
     const accessToken = localStorage.getItem('accessToken');
     if (
