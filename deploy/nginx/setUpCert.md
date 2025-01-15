@@ -1,1 +1,1 @@
-certbot --nginx -d yourdomain.com
+certbot --nginx -d api.nguyencao.com

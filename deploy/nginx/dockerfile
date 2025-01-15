@@ -1,7 +1,9 @@
 FROM fabiocicerchia/nginx-lua
 
-RUN apk add --no-cache vim curl lsof certbot certbot-nginx 
+RUN apk add --no-cache vim curl lsof certbot certbot-nginx build-base 
+RUN luarocks install lua-resty-jwt 
+RUN luarocks install lua-cjson
 
-COPY tmp.conf /etc/nginx/nginx.conf
+COPY init.conf /etc/nginx/nginx.conf
 
 CMD ["nginx", "-g", "daemon off;"]
