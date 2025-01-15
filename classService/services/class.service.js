@@ -12,7 +12,7 @@ import {
     classesKey,
     coursesInSemesterKey,
 } from '../config/redis/redis.config.js';
-import { NUMBER_OF_SUFFIX_CLASS_ID } from '../../teacherService/config/const.config.js';
+import { NUMBER_OF_SUFFIX_CLASS_ID } from '../config/const.config.js';
 import { RoomRepo } from '../models/repositories/room.repo.js';
 import ScheduleValidate from '../validate/schedule.validate.js';
 import { CheckService } from './check.service.js';

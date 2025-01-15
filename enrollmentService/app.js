@@ -15,7 +15,7 @@ import { init } from './config/gRPC/enrollment.grpc.server.js';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ credentials: true, origin: true }));
 app.use(cookieParser());
 app.use(compression());
 app.use(express.json());

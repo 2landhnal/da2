@@ -42,12 +42,12 @@ function OpenCourses() {
                     };
                 });
                 console.log({ semesters });
-                setSemesterLst(semesters);
-                semesters.forEach((s) => {
-                    if (s.status === 'active') {
+                semesters = semesters.forEach((s) => {
+                    if (s.status === 'openForRegistration') {
                         setSemester(s);
                     }
                 });
+                setSemesterLst(semesters);
             } catch (error) {
                 console.log(error);
             }

@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-gateway-service
+  name: nginx-service
 spec:
   selector:
-    app: auth-gateway-service
+    app: nginx
   ports:
     - protocol: TCP
-      port: 80        # Cổng service expose
-      targetPort: 8080  # Cổng trong container ứng dụng
-  type: LoadBalancer   # Chuyển sang LoadBalancer để tạo LB
+      port: 443 # Cổng service expose
+      targetPort: 443 # Cổng trong container ứng dụng
+  type: LoadBalancer

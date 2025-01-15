@@ -43,10 +43,10 @@ function ScheduleEdit(
     };
 
     // Schedule
-    const handleTimeSlotChange = (index, field, value) => {
+    const handleTimeSlotChange = (id, field, value) => {
         setSchedules((prevSchedules) => {
             const newSchedules = [...prevSchedules]; // Tạo bản sao của mảng schedules
-            newSchedules[index].timeSlots[index][field] = value;
+            newSchedules[index].timeSlots[id][field] = value;
             return newSchedules; // Trả về mảng đã cập nhật
         });
     };

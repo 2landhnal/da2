@@ -5,7 +5,7 @@ import { TeacherRepo } from '../../models/repositories/teacher.repo.js';
 import { sendToQueue } from '../messageQueue/connect.js';
 import { failedGRPC, successGRPC } from '../../responses/grpc.response.js';
 import { requestHandler } from '../../helpers/requestHandler.js';
-import { AccountStatus } from '../../../authService/utils/accountStatus.js';
+import { AccountStatus } from '../../utils/accountStatus.js';
 
 dotenv.config();
 

@@ -49,7 +49,7 @@ function Header() {
                 {
                     title: 'Danh sách lớp học mở trong kì',
                     onClick: () => {
-                        console.log('Danh sách lớp học mở trong kì');
+                        navigate(routePath.openClasses, { replace: true });
                     },
                 },
             ],

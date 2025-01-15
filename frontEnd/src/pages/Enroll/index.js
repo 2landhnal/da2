@@ -2,83 +2,138 @@ import { useEffect, useState } from 'react';
 import styles from './Enroll.module.scss';
 import classNames from 'classnames/bind';
 import SemesterBox from '../../components/SemesterBox';
-import { fetchGet } from '../../utils/fetch.utils';
-import { semesterUrl, semesterUrlSecure } from '../../config';
+import { fetchGet, fetchPost, fetchPut } from '../../utils/fetch.utils';
+import {
+    enrollmentUrl,
+    enrollmentUrlSecure,
+    semesterUrl,
+    semesterUrlSecure,
+} from '../../config';
+import { useAuth } from '../../routes/authProvider.route';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const cx = classNames.bind(styles);
 
 function Enroll() {
+    const { payload } = useAuth();
     const [classId, setClassId] = useState('');
     const [showError, setShowError] = useState(true);
     const [semesterLst, setSemesterLst] = useState([]);
     const [semester, setSemester] = useState(null);
+    const [classes, setClasses] = useState([]);
 
     useEffect(() => {
         const fun = async () => {
             try {
-                const query = {
-                    query: JSON.stringify({}),
-                };
                 const { metadata } = await fetchGet({
                     base: semesterUrlSecure,
-                    path: 'search',
-                    query: query,
+                    path: `schedule/checkAccess/${payload.uid.substring(0, 4)}`,
                 });
                 console.log({ metadata });
-                let { semesters } = metadata;
-                semesters = semesters.map((e, index) => {
+                let { accessible, semesterIds } = metadata;
+                semesterIds = semesterIds.map((e, index) => {
                     return {
-                        ...e,
-                        title: e.id,
+                        title: e,
                         onClick: () => {
-                            setSemester(semesters[index]);
+                            setSemester(semesterIds[index]);
                         },
                     };
                 });
-                console.log({ semesters });
-                setSemesterLst(semesters);
-                semesters.forEach((s) => {
-                    if (s.status === 'processing') {
-                        setSemester(s);
-                    }
-                });
+                console.log({ semesterIds });
+                setSemesterLst(semesterIds);
+                if (semesterIds.length > 0) {
+                    setSemester(semesterIds[0]);
+                }
             } catch (error) {
                 console.log(error);
             }
         };
         fun();
-    }, []);
+    }, [payload]);
 
     useEffect(() => {
-        const fun = () => {
+        const fun = async () => {
             try {
-                // const {classes}
+                const query = {
+                    studentId: payload.uid,
+                    semesterId: semester.title,
+                };
+                let { classes: _classes } = (
+                    await fetchGet({
+                        base: enrollmentUrlSecure,
+                        path: '/registered',
+                        query,
+                    })
+                ).metadata;
+                console.log({ _classes });
+                _classes = _classes.map((c) => {
+                    return {
+                        ...c,
+                        selected: false,
+                    };
+                });
+                setClasses(_classes);
             } catch (error) {
                 console.log(error);
             }
         };
+
+        fun();
     }, [semester]);
 
-    // State for registered classes
-    const [registeredClasses, setRegisteredClasses] = useState([
-        { id: 'MI2023', name: 'CTDL&GT', credit: 2, selected: false },
-        { id: 'MI2024', name: 'Toán Rời Rạc', credit: 3, selected: false },
-        {
-            id: 'MI2025',
-            name: 'Lập Trình Hướng Đối Tượng',
-            credit: 4,
-            selected: false,
-        },
-        { id: 'MI2026', name: 'Mạng Máy Tính', credit: 3, selected: true },
-    ]);
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        const response = await fetchPost({
+            base: enrollmentUrlSecure,
+            path: '/',
+            body: {
+                studentId: payload.uid,
+                classId,
+            },
+        });
+
+        if (response.ok) {
+            toast.success(response.message, { autoClose: 3000 });
+            setSemester((prev) => {
+                const tmp = prev;
+                return tmp;
+            });
+            // navigate(routePath.home, { replace: true });
+        } else {
+            toast.error(response.message || 'Invalid information', {
+                autoClose: 3000,
+            });
+            console.error(`Unenroll failed: ${response.message}`);
+        }
         // Handle enrollment logic here
     };
 
+    const handleRemove = async () => {
+        let selected = classes.filter((e) => e.selected);
+        selected = selected.map((e) => e.classId);
+        const response = await fetchPut({
+            base: enrollmentUrlSecure,
+            path: '/delete',
+            body: { studentId: payload.uid, classIds: selected },
+        });
+        if (response.ok) {
+            toast.success(response.message, { autoClose: 3000 });
+            setClasses((prev) => {
+                const tmp = prev;
+                return tmp.filter((e) => !selected.includes(e.classId));
+            });
+            // navigate(routePath.home, { replace: true });
+        } else {
+            toast.error(response.message || 'Invalid information', {
+                autoClose: 3000,
+            });
+            console.error(`Unenroll failed: ${response.message}`);
+        }
+    };
+
     const handleCheckboxChange = (index) => {
-        setRegisteredClasses((prevClasses) =>
+        setClasses((prevClasses) =>
             prevClasses.map((course, idx) =>
                 idx === index
                     ? { ...course, selected: !course.selected }
@@ -118,7 +173,12 @@ function Enroll() {
             <div className={cx('registeredSection')}>
                 <div className={cx('sectionHeader')}>
                     <h2 className={cx('sectionTitle')}>Lớp đã đăng ký</h2>
-                    <button className={cx('removeButton')}>Hủy đăng ký</button>
+                    <button
+                        className={cx('removeButton')}
+                        onClick={handleRemove}
+                    >
+                        Hủy đăng ký
+                    </button>
                 </div>
 
                 <div className={cx('tableContainer')}>
@@ -126,17 +186,19 @@ function Enroll() {
                         <thead>
                             <tr>
                                 <th>Mã lớp</th>
-                                <th>Môn học</th>
+                                <th>Mã học phần</th>
+                                <th>Học phần</th>
                                 <th>Số tín chỉ</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            {registeredClasses.map((course, index) => (
+                            {classes.map((course, index) => (
                                 <tr key={index}>
-                                    <td>{course.id}</td>
-                                    <td>{course.name}</td>
-                                    <td>{course.credit}</td>
+                                    <td>{course.classId}</td>
+                                    <td>{course.courseId}</td>
+                                    <td>{course.courseName}</td>
+                                    <td>{course.courseCredit}</td>
                                     <td>
                                         <input
                                             type="checkbox"
@@ -153,6 +215,7 @@ function Enroll() {
                     </table>
                 </div>
             </div>
+            <ToastContainer />
         </div>
     );
 }

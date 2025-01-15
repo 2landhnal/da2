@@ -22,6 +22,7 @@ import AddClass from '../pages/Form/addClass.js';
 import Semester from '../pages/Query/semester.js';
 import UpdateSemester from '../pages/Form/updateSemester.js';
 import AddSemester from '../pages/Form/addSemester.js';
+import OpenClass from '../pages/Query/openClass.js';
 
 export const routePath = {
     login: '/login',
@@ -48,6 +49,7 @@ export const routePath = {
     class: '/class',
     addClass: '/class/add',
     updateClass: '/class/update/:id',
+    openClasses: '/openClasses',
 };
 
 export const publicRoutes = [
@@ -61,8 +63,10 @@ export const publicRoutes = [
     { path: routePath.home, component: Home, layout: HeaderOnly },
     { path: routePath.course, component: Course },
     { path: routePath.openCourses, component: OpenCourses },
+    { path: routePath.openCourses, component: OpenCourses },
 ];
 export const privateRoutes = [
+    { path: routePath.openClasses, component: OpenClass },
     { path: routePath.registration, component: Registration },
     { path: routePath.room, component: Room, allowRoles: [RoleCode.BCSVC] },
     { path: routePath.updateInformation, component: UpdateInfor },

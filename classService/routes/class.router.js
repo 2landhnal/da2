@@ -12,8 +12,8 @@ router.get(
 );
 
 // auth required
-router.get('/search', authRequired, asyncHandler(ClassController.search));
-router.get('/:id', authRequired, asyncHandler(ClassController.findById));
+router.get('/search', asyncHandler(ClassController.search));
+router.get('/:id', asyncHandler(ClassController.findById));
 
 // bdtRequired
 router.put('/sync', bdtRequired, asyncHandler(ClassController.syncInfor));
